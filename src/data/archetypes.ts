@@ -19,6 +19,12 @@ export interface Archetype {
   shadowGift: string;
   /** Accent color used on the archetype's shareable card. */
   cardAccent: string;
+  /** 3 signature traits shown on the results page. */
+  signatureTraits: string[];
+  /** 3 short action recommendations calibrated to this archetype. */
+  recommendations: string[];
+  /** 3-4 mixed real / fictional examples for the paid PDF. */
+  famousExamples: string[];
 }
 
 export const archetypes: Archetype[] = [
@@ -35,6 +41,17 @@ export const archetypes: Archetype[] = [
     shadowGift:
       "Your visibility makes you a target. You mistake loyalty for agreement. When you fall, it is from inside — not outside.",
     cardAccent: "#C9A54C",
+    signatureTraits: [
+      "You assume authority instead of asking for it.",
+      "You lead best when everyone knows who is leading.",
+      "You mistake silence from allies for agreement.",
+    ],
+    recommendations: [
+      "Keep one advisor whose only job is to tell you what you are wrong about.",
+      "Name your second. Sovereigns without a succession plan end badly.",
+      "Write down the promises your team thinks you have made but have not said.",
+    ],
+    famousExamples: ["Julius Caesar", "Queen Elizabeth I", "Lee Kuan Yew", "Tywin Lannister"],
   },
   {
     id: "shadow",
@@ -49,6 +66,17 @@ export const archetypes: Archetype[] = [
     shadowGift:
       "Concealment is a cost you don't feel until it's paid. Years of unspoken moves leave you with leverage and no one to spend it on. Your network knows you but does not trust you.",
     cardAccent: "#8A8C91",
+    signatureTraits: [
+      "You treat information as the highest form of currency.",
+      "You would rather be underestimated than correctly sized.",
+      "You let others take credit for outcomes you designed.",
+    ],
+    recommendations: [
+      "Pick one relationship a year where you practice being seen.",
+      "Audit your leverage annually. Unused leverage rots into loneliness.",
+      "Accept that the cost of concealment is compounding emotional debt.",
+    ],
+    famousExamples: ["Lorenzo de' Medici", "Madeleine Albright", "Littlefinger (GoT)", "Talleyrand"],
   },
   {
     id: "architect",
@@ -63,6 +91,17 @@ export const archetypes: Archetype[] = [
     shadowGift:
       "Your blueprints outrun your will to build. The plan feels so complete in your head that beginning feels like a downgrade. Most Architects never lose — they never start.",
     cardAccent: "#B08C5C",
+    signatureTraits: [
+      "You think in feedback loops and second-order consequences.",
+      "You prefer structures that compound over moves that impress.",
+      "You freeze at the edge of imperfect execution.",
+    ],
+    recommendations: [
+      "Ship a v1 that embarrasses you. Iteration is the system you forgot to plan for.",
+      "Pair with a Blade. Their impatience is your missing motor.",
+      "Schedule monthly shipping deadlines you cannot renegotiate with yourself.",
+    ],
+    famousExamples: ["Charlie Munger", "Octavia Butler", "John Boyd", "Hari Seldon (Foundation)"],
   },
   {
     id: "oracle",
@@ -77,6 +116,17 @@ export const archetypes: Archetype[] = [
     shadowGift:
       "You see three moves ahead and assume others do too. They don't. Your warnings land as arrogance because the ground you're pointing at isn't visible yet.",
     cardAccent: "#D4AF6C",
+    signatureTraits: [
+      "You think in patterns others only see in retrospect.",
+      "You move people through insight, not pressure.",
+      "Your warnings often feel like arrogance until they land.",
+    ],
+    recommendations: [
+      "Keep a private log of your predictions with timestamps. Your track record is your leverage.",
+      "Translate your patterns into concrete bets others can take — don't just narrate.",
+      "Teach one person a year to read what you read. Oracles who die without apprentices die forgotten.",
+    ],
+    famousExamples: ["George Kennan", "Carl Jung", "Nate Silver", "Paul Atreides (Dune)"],
   },
   {
     id: "blade",
@@ -91,6 +141,17 @@ export const archetypes: Archetype[] = [
     shadowGift:
       "You cut before you're certain. Half your victories cost you more than losing would have. The archetype that beats you is the one who can wait longer than you can.",
     cardAccent: "#B8463E",
+    signatureTraits: [
+      "You move first and force the table to catch up.",
+      "You burn the path behind you so retreat isn't an option.",
+      "You win fast or lose fast; slow is your worst setting.",
+    ],
+    recommendations: [
+      "Build a 48-hour waiting rule for moves that affect people who cannot protect themselves.",
+      "Partner with one Architect who has veto power on irreversible decisions.",
+      "Count your scars. Blades who survive learn when NOT to cut.",
+    ],
+    famousExamples: ["Napoleon", "Serena Williams", "Steve Jobs (early Apple)", "Arya Stark"],
   },
   {
     id: "diplomat",
@@ -105,6 +166,17 @@ export const archetypes: Archetype[] = [
     shadowGift:
       "Being liked by everyone is a cage disguised as a crown. You avoid the decisive move because it would cost you a room. The ceiling on your power is the number of alliances you refuse to break.",
     cardAccent: "#B89A6A",
+    signatureTraits: [
+      "You hold multiple perspectives at once without losing your own.",
+      "You win rooms by being the person everyone needs and no one fears.",
+      "You treat agreement as a strategy, not a personality trait.",
+    ],
+    recommendations: [
+      "Pick one alliance you are willing to break this year. The refusal to break one is your ceiling.",
+      "Stop solving disagreements too fast. Sometimes the tension is the leverage.",
+      "Practice being the one who names the hard thing first.",
+    ],
+    famousExamples: ["Angela Merkel", "Barack Obama", "Nelson Mandela", "Jon Snow"],
   },
   {
     id: "hunter",
@@ -119,6 +191,17 @@ export const archetypes: Archetype[] = [
     shadowGift:
       "Your speed is your ceiling. You leave every position just before it would have compounded. You get rich in bursts and never build anything that remembers you.",
     cardAccent: "#9C6B3F",
+    signatureTraits: [
+      "You spot leverage faster than anyone in the room.",
+      "You sever attachments cleanly so speed stays cheap.",
+      "You treat positions as stepping stones, never homes.",
+    ],
+    recommendations: [
+      "Pick one long bet per decade and forbid yourself from exiting it early.",
+      "Compound something — capital, reputation, relationships. Pick one.",
+      "Anchor yourself to one person whose respect you will not burn for a deal.",
+    ],
+    famousExamples: ["Carl Icahn", "Travis Kalanick", "Han Solo", "Becky Sharp"],
   },
   {
     id: "flame",
@@ -133,6 +216,17 @@ export const archetypes: Archetype[] = [
     shadowGift:
       "You burn through the people drawn to you faster than you replace them. Magnetism without structure is a performance that gets quieter every year. You confuse being watched with being followed.",
     cardAccent: "#C97A3F",
+    signatureTraits: [
+      "You pull attention without trying. People move toward you.",
+      "You confuse chemistry for alliance. They aren't the same.",
+      "You are most dangerous when you are underestimated.",
+    ],
+    recommendations: [
+      "Build one boring system — finance, calendar, exercise. Magnetism needs scaffolding.",
+      "Pick three relationships to deepen. Stop collecting shallow ones.",
+      "Learn to say no in rooms where the default answer is charm.",
+    ],
+    famousExamples: ["Cleopatra", "Muhammad Ali", "David Bowie", "Daisy Buchanan"],
   },
 ];
 

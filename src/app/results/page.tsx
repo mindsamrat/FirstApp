@@ -14,6 +14,7 @@ import {
   type Archetype,
   type AxisId,
 } from "@/data/archetypes";
+import { computeSignatureAnswers, type SignatureAnswer, type StoredAnswer } from "@/lib/signature-answers";
 
 function clamp(raw: string | null, fallback = 50): number {
   if (!raw) return fallback;
@@ -90,9 +91,15 @@ function ResultsPage() {
       <div className="relative z-10 max-w-lg mx-auto px-6 pb-24">
         <RevealSection archetype={archetype} pq={pq} />
         <Divider />
+        <TraitsSection archetype={archetype} />
+        <Divider />
         <RaritySection archetype={archetype} rank={rank} />
         <Divider />
         <AxisBreakdownSection scores={scores} accent={archetype.cardAccent} />
+        <Divider />
+        <SignatureAnswersSection archetype={archetype} />
+        <Divider />
+        <RecommendationsSection archetype={archetype} />
         <Divider />
         <EnemySection archetype={archetype} enemy={enemy} />
         <Divider />
@@ -239,6 +246,109 @@ function EnemySection({ archetype, enemy }: { archetype: Archetype; enemy: Arche
           spot you first.
         </p>
       </div>
+    </section>
+  );
+}
+
+function TraitsSection({ archetype }: { archetype: Archetype }) {
+  return (
+    <section>
+      <p className="text-[10px] tracking-[0.3em] uppercase text-text-muted/40 mb-5 text-center font-[family-name:var(--font-body)]">
+        Your Signature Pattern
+      </p>
+      <div className="flex flex-col gap-3">
+        {archetype.signatureTraits.map((trait, i) => (
+          <div key={i} className="glass rounded-xl p-5 border-gradient flex items-start gap-4">
+            <span
+              className="font-[family-name:var(--font-heading)] text-2xl font-bold shrink-0"
+              style={{ color: archetype.cardAccent }}
+            >
+              0{i + 1}
+            </span>
+            <p className="text-text-primary/85 text-sm md:text-[15px] leading-[1.7] font-[family-name:var(--font-body)]">
+              {trait}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function SignatureAnswersSection({ archetype }: { archetype: Archetype }) {
+  const [signature, setSignature] = useState<SignatureAnswer[]>([]);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("pq_answers_v1");
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as StoredAnswer[];
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage hydration on mount
+      setSignature(computeSignatureAnswers(archetype, parsed));
+    } catch { /* ignore */ }
+  }, [archetype]);
+
+  if (signature.length === 0) return null;
+
+  return (
+    <section>
+      <p className="text-[10px] tracking-[0.3em] uppercase text-accent/60 mb-2 text-center font-[family-name:var(--font-body)]">
+        Why You Got {archetype.name}
+      </p>
+      <p className="text-text-muted/50 text-xs font-[family-name:var(--font-body)] text-center mb-6 italic max-w-sm mx-auto">
+        The three answers that pulled hardest toward your archetype.
+      </p>
+      <div className="flex flex-col gap-4">
+        {signature.map((s, i) => (
+          <div key={s.questionId} className="glass rounded-xl p-5 border-gradient">
+            <div className="flex items-baseline justify-between mb-2">
+              <span className="text-[10px] tracking-[0.25em] uppercase text-text-muted/40 font-[family-name:var(--font-body)]">
+                Signal {i + 1}
+              </span>
+              <span
+                className="text-[10px] font-[family-name:var(--font-body)] font-semibold"
+                style={{ color: archetype.cardAccent }}
+              >
+                +{s.pullScore.toFixed(1)} pull
+              </span>
+            </div>
+            <p className="text-text-primary/75 text-xs md:text-sm font-[family-name:var(--font-body)] italic mb-2">
+              {s.prompt}
+            </p>
+            <p className="text-text-primary/95 text-sm md:text-[15px] font-[family-name:var(--font-body)] leading-relaxed">
+              &ldquo;{s.optionText}&rdquo;
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RecommendationsSection({ archetype }: { archetype: Archetype }) {
+  return (
+    <section>
+      <p
+        className="text-[10px] tracking-[0.3em] uppercase mb-5 text-center font-[family-name:var(--font-body)]"
+        style={{ color: `${archetype.cardAccent}CC` }}
+      >
+        Practice — Three Moves For {archetype.name}
+      </p>
+      <ol className="flex flex-col gap-3">
+        {archetype.recommendations.map((rec, i) => (
+          <li
+            key={i}
+            className="glass rounded-xl p-5 border-gradient flex items-start gap-4"
+          >
+            <span className="text-[10px] tracking-[0.25em] uppercase text-text-muted/40 font-[family-name:var(--font-body)] font-semibold mt-1 shrink-0 w-6">
+              0{i + 1}
+            </span>
+            <p className="text-text-primary/85 text-sm md:text-[15px] leading-[1.7] font-[family-name:var(--font-body)]">
+              {rec}
+            </p>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }

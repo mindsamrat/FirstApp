@@ -91,6 +91,16 @@ export default function QuizPage() {
         clearProgress();
         try {
           sessionStorage.setItem("pq_freetext_v1", JSON.stringify(finalResult.freeText));
+          sessionStorage.setItem(
+            "pq_answers_v1",
+            JSON.stringify(
+              nextProgress.choiceAnswers.map((a) => ({
+                q: a.questionId,
+                o: a.optionId,
+                d: a.delta,
+              }))
+            )
+          );
         } catch { /* ignore */ }
         const qs = new URLSearchParams({
           id: finalResult.match.archetype.id,
