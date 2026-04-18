@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^4.5.1",
     "@types/bad-words": "^3.0.3",
     "bad-words": "^4.0.0",
     "framer-motion": "^12.38.0",

@@ -92,7 +92,7 @@ function ResultsPage() {
         <Divider />
         <ShareCardSection archetype={archetype} cardUrl={cardUrl} />
         <Divider />
-        <UpsellSection archetype={archetype} />
+        <UpsellSection archetype={archetype} scores={scores} pq={pq} />
         <Divider />
         <ComparisonSection archetype={archetype} />
 
@@ -335,9 +335,17 @@ function ShareCardSection({
   );
 }
 
-function UpsellSection({ archetype }: { archetype: Archetype }) {
+function UpsellSection({
+  archetype,
+  scores,
+  pq,
+}: {
+  archetype: Archetype;
+  scores: Record<AxisId, number>;
+  pq: number;
+}) {
   return (
-    <section>
+    <section className="flex flex-col gap-8">
       <div className="glass rounded-2xl p-8 md:p-10 border-gradient relative overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] bg-accent/[0.03] rounded-full blur-[80px]" />
         <div className="relative text-center">
@@ -358,11 +366,133 @@ function UpsellSection({ archetype }: { archetype: Archetype }) {
             Full Report — coming soon
           </button>
           <p className="text-text-muted/40 text-[11px] mt-4 font-[family-name:var(--font-body)] italic">
-            Free email summary and full PDF arrive in the next release.
+            Sovereign-tier analysis ships next release.
           </p>
         </div>
       </div>
+
+      <FreePdfSection archetype={archetype} scores={scores} pq={pq} />
     </section>
+  );
+}
+
+function FreePdfSection({
+  archetype,
+  scores,
+  pq,
+}: {
+  archetype: Archetype;
+  scores: Record<AxisId, number>;
+  pq: number;
+}) {
+  const [email, setEmail] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const [status, setStatus] = useState<"idle" | "submitting" | "ready" | "error">("idle");
+  const [error, setError] = useState<string | null>(null);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (honeypot) return;
+    setStatus("submitting");
+    setError(null);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          archetypeId: archetype.id,
+          scores,
+          pq,
+          source: "free-pdf",
+        }),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        setError(body.error ?? "Could not process that email.");
+        setStatus("error");
+        return;
+      }
+      setDownloadUrl(body.downloadUrl);
+      setStatus("ready");
+    } catch {
+      setError("Network error. Try again in a moment.");
+      setStatus("error");
+    }
+  };
+
+  if (status === "ready" && downloadUrl) {
+    return (
+      <div className="glass rounded-2xl p-8 md:p-10 border-gradient text-center">
+        <p className="text-[10px] tracking-[0.3em] uppercase text-accent/60 mb-3 font-[family-name:var(--font-body)]">
+          Your Summary Is Ready
+        </p>
+        <h3 className="font-[family-name:var(--font-heading)] text-2xl font-bold text-text-primary mb-6">
+          PQ Free Summary — {archetype.name}
+        </h3>
+        <a
+          href={downloadUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block bg-accent hover:bg-accent-light text-white font-semibold text-sm py-3.5 px-8 rounded-xl transition-all duration-300 font-[family-name:var(--font-body)] glow-accent btn-shine"
+        >
+          Open your PDF
+        </a>
+        <p className="text-text-muted/40 text-[11px] mt-5 font-[family-name:var(--font-body)]">
+          We will also email it to you once ConvertKit is wired up.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="glass rounded-2xl p-8 md:p-10 border-gradient">
+      <p className="text-[10px] tracking-[0.3em] uppercase text-text-muted/40 mb-3 font-[family-name:var(--font-body)] text-center">
+        Free 4-Page Summary
+      </p>
+      <h3 className="font-[family-name:var(--font-heading)] text-2xl font-bold text-text-primary mb-2 text-center">
+        Get the PDF.
+      </h3>
+      <p className="text-text-muted/50 text-sm mb-6 font-[family-name:var(--font-body)] text-center max-w-sm mx-auto">
+        Your archetype, axes, natural enemy, and the pattern to guard against.
+        Delivered instantly.
+      </p>
+      <form onSubmit={submit} className="flex flex-col gap-3">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="your@email.com"
+          required
+          autoComplete="email"
+          className="w-full glass rounded-xl px-5 py-3.5 text-text-primary text-sm font-[family-name:var(--font-body)] placeholder:text-text-muted/30 focus:outline-none"
+        />
+        <div className="absolute -left-[9999px]" aria-hidden="true">
+          <input
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            name="website"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={status === "submitting"}
+          className="bg-accent hover:bg-accent-light disabled:opacity-50 text-white font-semibold text-sm py-3.5 rounded-xl transition-all duration-300 font-[family-name:var(--font-body)] glow-accent btn-shine cursor-pointer"
+        >
+          {status === "submitting" ? "Generating..." : "Email me the summary"}
+        </button>
+      </form>
+      {error && (
+        <p className="text-accent text-xs mt-3 text-center font-[family-name:var(--font-body)]">{error}</p>
+      )}
+      <p className="text-text-muted/30 text-[10px] mt-4 text-center font-[family-name:var(--font-body)]">
+        No spam. Unsubscribe anytime.
+      </p>
+    </div>
   );
 }
 
