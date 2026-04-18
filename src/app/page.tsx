@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ArchetypeOrbital from "@/components/ArchetypeOrbital";
 
 export default function LandingPage() {
   const [loaded, setLoaded] = useState(false);
@@ -25,9 +26,9 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <main className="relative min-h-screen bg-[#080808] overflow-hidden text-white">
+    <main className="relative min-h-screen bg-[#080808] overflow-x-hidden text-white">
       {/* UI Layer */}
-      <div className="relative z-20 min-h-screen flex flex-col">
+      <div className="relative z-20 flex flex-col">
 
         {/* Top bar */}
         <div
@@ -42,7 +43,7 @@ export default function LandingPage() {
         </div>
 
         {/* Hero */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+        <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center px-6 text-center">
           {/* Label */}
           <div
             className={`transition-all duration-700 delay-200 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
@@ -203,11 +204,34 @@ export default function LandingPage() {
           </div>
         </div>
 
+        {/* The 8 Archetypes — Orbital */}
+        <section
+          id="archetypes"
+          className={`pt-12 pb-4 transition-all duration-1000 delay-[1100ms] ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+        >
+          <div className="text-center px-6 mb-4">
+            <p className="text-[10px] tracking-[0.35em] uppercase font-[family-name:var(--font-body)]" style={{ color: "rgba(201,168,76,0.8)" }}>
+              The Eight Archetypes
+            </p>
+            <h2 className="font-[family-name:var(--font-heading)] text-3xl md:text-4xl font-bold text-white/95 mt-3 mb-3" style={{ lineHeight: 1.1 }}>
+              Map of Power
+            </h2>
+            <p className="text-sm md:text-base text-white/45 font-[family-name:var(--font-body)] max-w-md mx-auto italic">
+              Click any archetype to see its signature. Pairs in white arcs are natural enemies.
+            </p>
+          </div>
+          <ArchetypeOrbital />
+        </section>
+
         {/* Footer */}
         <div
           className={`py-8 transition-all duration-700 delay-[1000ms] ${loaded ? "opacity-100" : "opacity-0"}`}
         >
           <div className="flex items-center justify-center gap-6 text-[10px] font-[family-name:var(--font-body)]">
+            <Link href="#archetypes" className="transition-colors duration-300 hover:text-white/50" style={{ color: "rgba(255,255,255,0.2)" }}>
+              Archetypes
+            </Link>
+            <span style={{ color: "rgba(255,255,255,0.1)" }}>|</span>
             <Link
               href="/privacy"
               className="transition-colors duration-300"

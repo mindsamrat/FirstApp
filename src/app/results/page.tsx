@@ -64,13 +64,21 @@ function ResultsPage() {
     return `/api/card?${qs.toString()}`;
   }, [archetype.id, scores]);
 
+  const accent = archetype.cardAccent;
   return (
-    <main className="min-h-screen bg-primary-bg bg-gradient-animate relative grain">
+    <main
+      className="min-h-screen relative grain text-white"
+      style={{
+        background: `radial-gradient(ellipse 120% 70% at 50% -5%, ${accent}22, transparent 55%), radial-gradient(ellipse 80% 60% at 50% 105%, ${accent}18, transparent 60%), linear-gradient(180deg, #0F0B0D 0%, #0B0A0D 40%, #0A0A0A 100%)`,
+      }}
+    >
       <div className="particle" /><div className="particle" /><div className="particle" />
       <div className="particle" /><div className="particle" /><div className="particle" />
 
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[150px]" style={{ background: `${archetype.cardAccent}0A` }} />
+        <div className="absolute top-[8%] left-1/2 -translate-x-1/2 w-[720px] h-[720px] rounded-full blur-[160px]" style={{ background: `${accent}1A` }} />
+        <div className="absolute top-[45%] left-[-10%] w-[420px] h-[420px] rounded-full blur-[140px]" style={{ background: `${accent}0E` }} />
+        <div className="absolute bottom-[5%] right-[-10%] w-[500px] h-[500px] rounded-full blur-[160px]" style={{ background: "#C9A84C12" }} />
       </div>
 
       <div className="relative z-10 pt-8 pb-2 text-center">
