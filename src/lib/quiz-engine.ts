@@ -1,4 +1,4 @@
-import { questions, type Question, type ChoiceQuestion, type FreeTextQuestion, type OptionId } from "@/data/questions";
+import { questions, type Question, type ChoiceQuestion, type FreeTextQuestion, type EmailQuestion, type OptionId } from "@/data/questions";
 import { calculateAxisScores, matchArchetype, computePQ, type AnswerDelta, type AxisScores, type MatchResult } from "@/lib/scoring";
 
 export interface ChoiceAnswer {
@@ -26,19 +26,21 @@ const calibration = questions.filter((q): q is ChoiceQuestion => q.kind === "cal
 const branched = questions.filter((q): q is ChoiceQuestion => q.kind === "branched");
 const tiebreakers = questions.filter((q): q is ChoiceQuestion => q.kind === "tiebreaker");
 const freeText = questions.filter((q): q is FreeTextQuestion => q.kind === "free-text");
+const email = questions.filter((q): q is EmailQuestion => q.kind === "email");
 
 /**
  * Build the served-question plan for this user.
  *
- * With a 25-question bank and the spec's "25 questions per user" target, every
- * user currently sees the full bank: 5 calibration, 15 branched, 3 tiebreakers,
- * 2 free-text. Once the bank grows past 30, this selector should read
- * mid-quiz scores and sub-select from the branched pool. Keeping the shape
- * here so the caller need not change when branching is added.
+ * Order:
+ *   1. Calibration (5)  — fixed, all users see these in the same order
+ *   2. Branched pool    — currently all served; will sub-select once bank grows past ~30
+ *   3. Tiebreakers      — currently all served; will be conditional on score gap
+ *   4. Free-text        — optional descriptive prompts
+ *   5. Email            — required final step before results unlock
  */
 export function buildQuizPlan(_seed?: string): Question[] {
   void _seed;
-  return [...calibration, ...branched, ...tiebreakers, ...freeText];
+  return [...calibration, ...branched, ...tiebreakers, ...freeText, ...email];
 }
 
 export function getQuestionById(id: string): Question | undefined {
