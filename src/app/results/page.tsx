@@ -708,33 +708,79 @@ function UpsellSection({
 }) {
   return (
     <section className="flex flex-col gap-8">
-      <div className="glass rounded-2xl p-8 md:p-10 border-gradient relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] bg-accent/[0.03] rounded-full blur-[80px]" />
-        <div className="relative text-center">
-          <p className="text-[10px] tracking-[0.3em] uppercase text-accent/60 mb-3 font-[family-name:var(--font-body)]">
-            Full PQ Report
-          </p>
-          <h3 className="font-[family-name:var(--font-heading)] text-2xl md:text-3xl font-bold text-text-primary mb-2">
-            Unlock your full analysis.
-          </h3>
-          <p className="text-text-muted/50 text-sm mb-8 font-[family-name:var(--font-body)] max-w-sm mx-auto">
-            A 24-page personalized report: {archetype.name} across love, money,
-            leadership, enemies, and legacy.
-          </p>
-          <button
-            disabled
-            className="w-full text-center bg-accent/40 text-white/80 font-semibold text-sm py-4 rounded-xl font-[family-name:var(--font-body)] cursor-not-allowed"
-          >
-            Full Report — coming soon
-          </button>
-          <p className="text-text-muted/40 text-[11px] mt-4 font-[family-name:var(--font-body)] italic">
-            Sovereign-tier analysis ships next release.
-          </p>
-        </div>
-      </div>
-
+      <PaidUnlockCard archetype={archetype} />
       <FreePdfSection archetype={archetype} scores={scores} pq={pq} />
     </section>
+  );
+}
+
+function PaidUnlockCard({ archetype }: { archetype: Archetype }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const startCheckout = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const responseId =
+        typeof window !== "undefined"
+          ? sessionStorage.getItem("pq_response_id")
+          : null;
+
+      if (!responseId) {
+        setError("Your session has expired. Re-take the quiz to unlock the report.");
+        setLoading(false);
+        return;
+      }
+
+      const res = await fetch("/api/checkout/dodo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ responseId }),
+      });
+      const body = await res.json();
+      if (!res.ok || !body.checkoutUrl) {
+        setError(body.error ?? "Could not start checkout. Try again.");
+        setLoading(false);
+        return;
+      }
+      window.location.href = body.checkoutUrl;
+    } catch {
+      setError("Network error. Try again.");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="glass rounded-2xl p-8 md:p-10 border-gradient relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] bg-accent/[0.03] rounded-full blur-[80px]" />
+      <div className="relative text-center">
+        <p className="text-[10px] tracking-[0.3em] uppercase text-accent/60 mb-3 font-[family-name:var(--font-body)]">
+          Full PQ Report — $3
+        </p>
+        <h3 className="font-[family-name:var(--font-heading)] text-2xl md:text-3xl font-bold text-text-primary mb-2">
+          Unlock your full analysis.
+        </h3>
+        <p className="text-text-muted/50 text-sm mb-8 font-[family-name:var(--font-body)] max-w-sm mx-auto">
+          A 24-page personalized report: {archetype.name} across love, money,
+          leadership, enemies, and legacy. Quotes your actual answers. Watermarked
+          to your email.
+        </p>
+        <button
+          onClick={startCheckout}
+          disabled={loading}
+          className="w-full text-center bg-accent hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm py-4 rounded-xl font-[family-name:var(--font-body)] transition-all duration-300 cursor-pointer glow-accent btn-shine"
+        >
+          {loading ? "Opening secure checkout…" : "Unlock Full Report — $3"}
+        </button>
+        {error && (
+          <p className="text-accent text-xs mt-3 font-[family-name:var(--font-body)]">{error}</p>
+        )}
+        <p className="text-text-muted/40 text-[11px] mt-4 font-[family-name:var(--font-body)] italic">
+          Secure payment via Dodo. Instant download. No subscription.
+        </p>
+      </div>
+    </div>
   );
 }
 
