@@ -15,6 +15,18 @@ import {
   type AxisId,
 } from "@/data/archetypes";
 import { computeSignatureAnswers, type SignatureAnswer, type StoredAnswer } from "@/lib/signature-answers";
+import { matchArchetype, type AxisScores } from "@/lib/scoring";
+import {
+  archetypeBlend,
+  deriveReadings,
+  perAxisAttribution,
+  readConfidence,
+  topArchetypes,
+  type AxisAttribution,
+  type BlendEntry,
+  type ConfidenceReading,
+  type DerivedReading,
+} from "@/lib/result-analysis";
 
 function clamp(raw: string | null, fallback = 50): number {
   if (!raw) return fallback;
@@ -54,6 +66,11 @@ function ResultsPage() {
   const enemy = getEnemy(archetype);
   const rank = getRarityRank(archetype);
 
+  const match = useMemo(() => matchArchetype(scores), [scores]);
+  const blend = useMemo(() => archetypeBlend(scores), [scores]);
+  const confidence = useMemo(() => readConfidence(match), [match]);
+  const readings = useMemo(() => deriveReadings(scores), [scores]);
+
   const cardUrl = useMemo(() => {
     const qs = new URLSearchParams({
       id: archetype.id,
@@ -91,13 +108,21 @@ function ResultsPage() {
       <div className="relative z-10 max-w-lg mx-auto px-6 pb-24">
         <RevealSection archetype={archetype} pq={pq} />
         <Divider />
+        <ConfidenceSection confidence={confidence} accent={archetype.cardAccent} />
+        <Divider />
+        <BlendSection blend={blend} accent={archetype.cardAccent} />
+        <Divider />
         <TraitsSection archetype={archetype} />
         <Divider />
         <RaritySection archetype={archetype} rank={rank} />
         <Divider />
         <AxisBreakdownSection scores={scores} accent={archetype.cardAccent} />
         <Divider />
+        <PerAxisAttributionSection scores={scores} accent={archetype.cardAccent} />
+        <Divider />
         <SignatureAnswersSection archetype={archetype} />
+        <Divider />
+        <DerivedReadingsSection readings={readings} accent={archetype.cardAccent} />
         <Divider />
         <RecommendationsSection archetype={archetype} />
         <Divider />
@@ -247,6 +272,225 @@ function EnemySection({ archetype, enemy }: { archetype: Archetype; enemy: Arche
         </p>
       </div>
     </section>
+  );
+}
+
+function ConfidenceSection({
+  confidence,
+  accent,
+}: {
+  confidence: ConfidenceReading;
+  accent: string;
+}) {
+  const dot =
+    confidence.level === "high" ? "#3FBF63"
+    : confidence.level === "moderate" ? "#D4B86A"
+    : "#E8526A";
+  return (
+    <section className="text-center">
+      <div
+        className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full"
+        style={{
+          background: "rgba(255,255,255,0.04)",
+          border: `1px solid ${accent}30`,
+        }}
+      >
+        <span
+          className="w-2 h-2 rounded-full"
+          style={{ background: dot, boxShadow: `0 0 12px ${dot}80` }}
+        />
+        <span className="text-[11px] tracking-[0.25em] uppercase font-semibold font-[family-name:var(--font-body)]" style={{ color: dot }}>
+          {confidence.label}
+        </span>
+      </div>
+      <p className="text-text-muted/60 text-sm md:text-[15px] font-[family-name:var(--font-body)] mt-5 max-w-md mx-auto leading-relaxed">
+        {confidence.description}
+      </p>
+    </section>
+  );
+}
+
+function BlendSection({
+  blend,
+  accent,
+}: {
+  blend: BlendEntry[];
+  accent: string;
+}) {
+  const top = topArchetypes(blend, 3);
+  return (
+    <section>
+      <p className="text-[10px] tracking-[0.3em] uppercase text-text-muted/40 mb-2 text-center font-[family-name:var(--font-body)]">
+        Archetype Blend
+      </p>
+      <p className="text-text-muted/45 text-xs italic font-[family-name:var(--font-body)] text-center mb-7 max-w-sm mx-auto">
+        No one is a pure type. Here's how your signature distributes across all 8 archetypes.
+      </p>
+      <div className="flex flex-col gap-4">
+        {top.map((entry) => (
+          <div key={entry.id}>
+            <div className="flex items-baseline justify-between mb-2">
+              <span className="font-[family-name:var(--font-heading)] text-base md:text-lg font-semibold text-text-primary">
+                {entry.name}
+              </span>
+              <span className="font-[family-name:var(--font-heading)] text-lg font-bold" style={{ color: accent }}>
+                {entry.percent}%
+              </span>
+            </div>
+            <div className="h-[3px] w-full bg-divider-dark rounded-full overflow-hidden">
+              <div
+                className="h-full transition-[width] duration-1000 ease-out"
+                style={{ width: `${entry.percent}%`, background: accent }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PerAxisAttributionSection({
+  scores,
+  accent,
+}: {
+  scores: AxisScores;
+  accent: string;
+}) {
+  const [attribution, setAttribution] = useState<AxisAttribution | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("pq_answers_v1");
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as StoredAnswer[];
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage hydration
+      setAttribution(perAxisAttribution(parsed));
+    } catch { /* ignore */ }
+  }, []);
+
+  if (!attribution) return null;
+  const axes: AxisId[] = ["control", "visibility", "timeHorizon", "powerSource"];
+
+  return (
+    <section>
+      <p className="text-[10px] tracking-[0.3em] uppercase text-text-muted/40 mb-2 text-center font-[family-name:var(--font-body)]">
+        How Each Axis Was Built
+      </p>
+      <p className="text-text-muted/45 text-xs italic font-[family-name:var(--font-body)] text-center mb-7 max-w-sm mx-auto">
+        For every axis, the two answers that pushed your score there the most.
+      </p>
+      <div className="flex flex-col gap-6">
+        {axes.map((axis) => {
+          const entries = attribution[axis];
+          if (!entries || entries.length === 0) return null;
+          return (
+            <div key={axis}>
+              <div className="flex items-baseline justify-between mb-3">
+                <span className="text-xs tracking-[0.25em] uppercase text-text-muted/70 font-[family-name:var(--font-body)] font-semibold">
+                  {axisLabels[axis]}
+                </span>
+                <span className="font-[family-name:var(--font-heading)] text-base font-semibold" style={{ color: accent }}>
+                  {scores[axis]}
+                </span>
+              </div>
+              <div className="flex flex-col gap-3">
+                {entries.map((e) => (
+                  <div
+                    key={e.questionId}
+                    className="glass rounded-xl p-4 border-gradient"
+                  >
+                    <div className="flex items-baseline justify-between gap-3 mb-2">
+                      <span className="text-[10px] tracking-[0.2em] uppercase text-text-muted/50 font-[family-name:var(--font-body)]">
+                        {e.framework?.name ?? "Framework"}
+                      </span>
+                      <span
+                        className="text-[10px] font-[family-name:var(--font-body)] font-semibold"
+                        style={{ color: e.delta > 0 ? "#3FBF63" : "#E8526A" }}
+                      >
+                        {e.delta > 0 ? "+" : ""}{e.delta} on {axisLabels[axis]}
+                      </span>
+                    </div>
+                    <p className="text-text-primary/70 text-xs italic font-[family-name:var(--font-body)] mb-1.5">
+                      {e.prompt}
+                    </p>
+                    <p className="text-text-primary/95 text-sm font-[family-name:var(--font-body)] leading-relaxed">
+                      &ldquo;{e.optionText}&rdquo;
+                    </p>
+                    {e.framework && (
+                      <p className="text-text-muted/35 text-[10px] mt-2 font-[family-name:var(--font-body)]">
+                        {e.framework.citation} · {e.framework.probes}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function DerivedReadingsSection({
+  readings,
+  accent,
+}: {
+  readings: DerivedReading[];
+  accent: string;
+}) {
+  return (
+    <section>
+      <p className="text-[10px] tracking-[0.3em] uppercase text-text-muted/40 mb-2 text-center font-[family-name:var(--font-body)]">
+        Per-Axis Reading
+      </p>
+      <p className="text-text-muted/45 text-xs italic font-[family-name:var(--font-body)] text-center mb-7 max-w-sm mx-auto">
+        What your score on each axis actually means — strength, warning, and one move to practice.
+      </p>
+      <div className="flex flex-col gap-5">
+        {readings.map((r) => (
+          <div key={r.axis} className="glass rounded-xl p-5 md:p-6 border-gradient">
+            <div className="flex items-baseline justify-between mb-4">
+              <span className="text-xs tracking-[0.25em] uppercase text-text-muted/70 font-[family-name:var(--font-body)] font-semibold">
+                {r.label}
+              </span>
+              <span
+                className="text-[10px] tracking-[0.2em] uppercase font-[family-name:var(--font-body)] font-semibold px-2.5 py-1 rounded-full"
+                style={{
+                  background: `${accent}20`,
+                  color: accent,
+                  border: `1px solid ${accent}40`,
+                }}
+              >
+                {r.band}
+              </span>
+            </div>
+            <div className="space-y-3">
+              <Reading label="Strength" body={r.strength} accent="#9BBF7B" />
+              <Reading label="Warning" body={r.warning} accent="#E8A85A" />
+              <Reading label="Practice" body={r.practice} accent={accent} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Reading({ label, body, accent }: { label: string; body: string; accent: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <span
+        className="text-[9px] tracking-[0.25em] uppercase font-[family-name:var(--font-body)] font-semibold mt-1 shrink-0 w-16"
+        style={{ color: accent }}
+      >
+        {label}
+      </span>
+      <p className="text-text-primary/85 text-sm font-[family-name:var(--font-body)] leading-[1.6]">
+        {body}
+      </p>
+    </div>
   );
 }
 
