@@ -20,11 +20,23 @@ export const metadata: Metadata = {
   title: "PQ — The Power Quotient Assessment | Way of Gods",
   description:
     "The PQ Assessment maps your psychology of power across 4 axes and 8 archetypes. A proprietary diagnostic from Way of Gods.",
+  metadataBase: new URL("https://quiz.wayofgods.com"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "PQ — The Power Quotient Assessment",
     description:
-      "25 questions. 4 axes of power. 8 archetypes. Discover which one drives your decisions.",
+      "27 questions. 4 axes of power. 8 archetypes. Discover which one drives your decisions.",
     type: "website",
+    url: "https://quiz.wayofgods.com",
+    siteName: "Way of Gods",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PQ — The Power Quotient Assessment",
+    description:
+      "27 questions. 4 axes of power. 8 archetypes. Discover which one drives your decisions.",
   },
 };
 

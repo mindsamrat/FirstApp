@@ -34,12 +34,13 @@ export default function LandingPage() {
         <div
           className={`pt-10 pb-4 text-center transition-all duration-1000 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}
         >
-          <span
-            className="text-[10px] tracking-[0.5em] uppercase font-[family-name:var(--font-body)]"
+          <a
+            href="https://wayofgods.com"
+            className="text-[10px] tracking-[0.5em] uppercase font-[family-name:var(--font-body)] transition-colors duration-300 hover:text-white/50"
             style={{ color: "rgba(255,255,255,0.25)" }}
           >
             Way of Gods
-          </span>
+          </a>
         </div>
 
         {/* Hero */}
