@@ -1,15 +1,29 @@
 import { NextResponse } from "next/server";
 import { validateEmail } from "@/lib/email-validation";
 import { recordSubscriber } from "@/lib/subscriber-store";
+import { saveResponseToSupabase } from "@/lib/supabase-server";
 import { getArchetypeById } from "@/data/archetypes";
 
 export const runtime = "nodejs";
+
+interface AnswerEntry {
+  q: string;
+  o: string;
+  d: { control: number; visibility: number; timeHorizon: number; powerSource: number };
+}
+
+interface FreeTextEntry {
+  questionId: string;
+  text: string;
+}
 
 interface SubscribePayload {
   email: string;
   archetypeId: string;
   scores: { control: number; visibility: number; timeHorizon: number; powerSource: number };
   pq: number;
+  answers?: AnswerEntry[];
+  freeText?: FreeTextEntry[];
   source?: "free-pdf" | "paid-pdf";
   honeypot?: string;
 }
@@ -32,7 +46,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true }, { status: 200 });
   }
 
-  const emailCheck = validateEmail(body.email ?? "");
+  const emailCheck = await validateEmail(body.email ?? "");
   if (!emailCheck.valid || !emailCheck.normalized) {
     return NextResponse.json({ error: emailCheck.error ?? "Invalid email." }, { status: 400 });
   }
@@ -48,16 +62,45 @@ export async function POST(req: Request) {
     timeHorizon: clampScore(body.scores?.timeHorizon),
     powerSource: clampScore(body.scores?.powerSource),
   };
+  const pq = clampScore(body.pq);
+  const answers = Array.isArray(body.answers) ? body.answers : [];
+  const freeText = Array.isArray(body.freeText) ? body.freeText : [];
 
-  const record = await recordSubscriber({
-    email: emailCheck.normalized,
-    archetypeId: archetype.id,
-    scores,
-    pq: clampScore(body.pq),
-    source: body.source === "paid-pdf" ? "paid-pdf" : "free-pdf",
-    userAgent: req.headers.get("user-agent"),
-    referrer: req.headers.get("referer"),
-  });
+  const userAgent = req.headers.get("user-agent");
+  const referrer = req.headers.get("referer");
+  const xff = req.headers.get("x-forwarded-for");
+  const ip = xff ? xff.split(",")[0].trim() : null;
+
+  // Primary: write to Supabase if configured, else fall back to local NDJSON scaffold.
+  let responseId: string | null = null;
+  try {
+    responseId = await saveResponseToSupabase({
+      email: emailCheck.normalized,
+      archetypeId: archetype.id,
+      pq,
+      scores,
+      answers,
+      freeText,
+      userAgent,
+      ipAddress: ip,
+    });
+  } catch (err) {
+    console.error("[subscribe] supabase write failed", err);
+  }
+
+  if (!responseId) {
+    // Fallback to the local scaffold so leads aren't lost while Supabase env is missing.
+    const record = await recordSubscriber({
+      email: emailCheck.normalized,
+      archetypeId: archetype.id,
+      scores,
+      pq,
+      source: body.source === "paid-pdf" ? "paid-pdf" : "free-pdf",
+      userAgent,
+      referrer,
+    });
+    responseId = record.id;
+  }
 
   const qs = new URLSearchParams({
     id: archetype.id,
@@ -65,12 +108,13 @@ export async function POST(req: Request) {
     v: String(scores.visibility),
     t: String(scores.timeHorizon),
     p: String(scores.powerSource),
-    pq: String(clampScore(body.pq)),
-    token: record.id,
+    pq: String(pq),
+    token: responseId.slice(0, 8),
   });
 
   return NextResponse.json({
     ok: true,
+    responseId,
     downloadUrl: `/api/pdf/free?${qs.toString()}`,
   });
 }
