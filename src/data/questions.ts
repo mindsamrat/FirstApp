@@ -10,14 +10,33 @@ export interface QuestionOption {
   scores: Partial<AxisScores>;
 }
 
-export type QuestionKind = "calibration" | "branched" | "tiebreaker" | "free-text";
+export type QuestionKind = "calibration" | "branched" | "tiebreaker" | "free-text" | "email";
+
+/**
+ * Each question is grounded in a recognised psychology / behavioural
+ * economics tradition. We expose this on the results page and the paid PDF
+ * so users see the framework, not just a vibe.
+ */
+export interface FrameworkRef {
+  /** Short name shown to users, e.g. "Self-Monitoring Scale". */
+  name: string;
+  /** Short citation, e.g. "Snyder, 1974". */
+  citation: string;
+  /** One-line plain-English explanation of what this framework probes. */
+  probes: string;
+}
 
 export interface ChoiceQuestion {
   id: string;
-  kind: Exclude<QuestionKind, "free-text">;
+  kind: Exclude<QuestionKind, "free-text" | "email">;
   prompt: string;
   options: [QuestionOption, QuestionOption, QuestionOption, QuestionOption];
+  /** All axes this question contributes points to. */
   probes?: Axis[];
+  /** The dominant axis this question is designed to differentiate. */
+  primaryAxis?: Axis;
+  /** Which research tradition this question maps to. */
+  framework?: FrameworkRef;
 }
 
 export interface FreeTextQuestion {
@@ -29,7 +48,14 @@ export interface FreeTextQuestion {
   usageNote: string;
 }
 
-export type Question = ChoiceQuestion | FreeTextQuestion;
+export interface EmailQuestion {
+  id: string;
+  kind: "email";
+  prompt: string;
+  subPrompt: string;
+}
+
+export type Question = ChoiceQuestion | FreeTextQuestion | EmailQuestion;
 
 export const questions: Question[] = [
   {
@@ -37,6 +63,12 @@ export const questions: Question[] = [
     kind: "calibration",
     prompt: "When you walk into a room full of strangers, your instinct is to:",
     probes: ["control", "visibility"],
+    primaryAxis: "visibility",
+    framework: {
+      name: "Self-Monitoring Scale",
+      citation: "Snyder, 1974",
+      probes: "How much you adjust your behaviour to the room you're in.",
+    },
     options: [
       { id: "a", text: "Become the center of attention within 10 minutes.", scores: { control: 15, visibility: 15, powerSource: 5 } },
       { id: "b", text: "Identify the two most powerful people and position yourself near them.", scores: { control: 5, visibility: -10, timeHorizon: 10, powerSource: 5 } },
@@ -49,6 +81,12 @@ export const questions: Question[] = [
     kind: "calibration",
     prompt: "People tend to do what you want because:",
     probes: ["powerSource", "control"],
+    primaryAxis: "powerSource",
+    framework: {
+      name: "Bases of Social Power",
+      citation: "French & Raven, 1959",
+      probes: "Whether you wield coercive, expert, or referent power.",
+    },
     options: [
       { id: "a", text: "They don't want to find out what happens if they don't.", scores: { control: 15, powerSource: 20 } },
       { id: "b", text: "They trust your judgment more than their own on the matter.", scores: { control: 10, timeHorizon: 10, powerSource: -10 } },
@@ -61,6 +99,12 @@ export const questions: Question[] = [
     kind: "calibration",
     prompt: "Your ideal public recognition looks like:",
     probes: ["visibility"],
+    primaryAxis: "visibility",
+    framework: {
+      name: "Public Self-Consciousness",
+      citation: "Fenigstein, Scheier & Buss, 1975",
+      probes: "How much you orient toward an external audience.",
+    },
     options: [
       { id: "a", text: "Your name known in rooms you've never entered.", scores: { control: 10, visibility: 20 } },
       { id: "b", text: "Quiet respect from the people whose opinions actually matter.", scores: { visibility: -15, powerSource: -10 } },
@@ -73,6 +117,12 @@ export const questions: Question[] = [
     kind: "calibration",
     prompt: "You learn someone is quietly working against you. Your move:",
     probes: ["timeHorizon", "powerSource"],
+    primaryAxis: "timeHorizon",
+    framework: {
+      name: "Temporal Discounting",
+      citation: "Loewenstein & Prelec, 1992",
+      probes: "How heavily you weight an immediate move vs a delayed one.",
+    },
     options: [
       { id: "a", text: "Confront them immediately and end it in one conversation.", scores: { visibility: 10, timeHorizon: -15, powerSource: 15 } },
       { id: "b", text: "Start building the trap and let them walk into it over months.", scores: { control: 10, timeHorizon: 20, powerSource: 10 } },
@@ -85,6 +135,12 @@ export const questions: Question[] = [
     kind: "calibration",
     prompt: "Pick the statement most true about you:",
     probes: ["powerSource", "visibility"],
+    primaryAxis: "powerSource",
+    framework: {
+      name: "Need for Power",
+      citation: "McClelland, 1975",
+      probes: "Your underlying motive: visibility, control, or quiet impact.",
+    },
     options: [
       { id: "a", text: "I would rather be feared than liked, if I had to choose.", scores: { control: 10, powerSource: 15 } },
       { id: "b", text: "I would rather be influential than famous.", scores: { visibility: -10, timeHorizon: 10, powerSource: -5 } },
@@ -97,6 +153,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "You're given a team of ten people. You immediately want to:",
     probes: ["control"],
+    primaryAxis: "control",
+    framework: {
+      name: "Power Distance Orientation",
+      citation: "Hofstede, 1980",
+      probes: "How comfortable you are with explicit hierarchy and command.",
+    },
     options: [
       { id: "a", text: "Set clear rules, hierarchies, and consequences.", scores: { control: 15, powerSource: 10 } },
       { id: "b", text: "Identify the top two and make everyone else work through them.", scores: { control: 10, visibility: -5, timeHorizon: 10 } },
@@ -109,6 +171,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "Decades from now, you want to be remembered as:",
     probes: ["timeHorizon", "visibility"],
+    primaryAxis: "timeHorizon",
+    framework: {
+      name: "Generativity",
+      citation: "Erikson, 1950",
+      probes: "How far past your own lifetime your ambition reaches.",
+    },
     options: [
       { id: "a", text: "Someone who built something that still stands.", scores: { control: 10, timeHorizon: 20 } },
       { id: "b", text: "Someone whose decisions changed the trajectory of others' lives.", scores: { control: 10, visibility: -10, timeHorizon: 15 } },
@@ -121,6 +189,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "In a negotiation where you hold the weaker hand, you:",
     probes: ["powerSource", "timeHorizon"],
+    primaryAxis: "powerSource",
+    framework: {
+      name: "Prospect Theory",
+      citation: "Kahneman & Tversky, 1979",
+      probes: "How loss-averse you are when stakes are real.",
+    },
     options: [
       { id: "a", text: "Bluff hard and commit like you hold the stronger one.", scores: { timeHorizon: -10, powerSource: 15 } },
       { id: "b", text: "Find what they actually want that isn't on the table and offer that.", scores: { control: 10, timeHorizon: 10, powerSource: -15 } },
@@ -133,6 +207,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "Someone you trusted betrays you publicly. You:",
     probes: ["powerSource", "timeHorizon", "visibility"],
+    primaryAxis: "powerSource",
+    framework: {
+      name: "Reactive vs Proactive Aggression",
+      citation: "Dodge & Coie, 1987",
+      probes: "Whether you respond to threat in heat or in cold.",
+    },
     options: [
       { id: "a", text: "Destroy their reputation openly and quickly.", scores: { visibility: 15, timeHorizon: -15, powerSource: 20 } },
       { id: "b", text: "Say nothing. Quietly remove them from every room they want to enter.", scores: { visibility: -15, timeHorizon: 20, powerSource: 15 } },
@@ -145,6 +225,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "You did the work but someone else is getting the credit. You:",
     probes: ["timeHorizon", "visibility"],
+    primaryAxis: "visibility",
+    framework: {
+      name: "Status Signaling",
+      citation: "Anderson & Kennedy, 2012",
+      probes: "How important credit and recognition are to you.",
+    },
     options: [
       { id: "a", text: "Confront them directly and demand correction.", scores: { visibility: 15, timeHorizon: -15, powerSource: 15 } },
       { id: "b", text: "Document everything quietly so the truth emerges naturally.", scores: { control: 5, visibility: -10, timeHorizon: 20 } },
@@ -157,6 +243,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "A rare opportunity surfaces that requires acting within 48 hours. You:",
     probes: ["timeHorizon"],
+    primaryAxis: "timeHorizon",
+    framework: {
+      name: "Consideration of Future Consequences",
+      citation: "Strathman et al., 1994",
+      probes: "Tactical-now vs strategic-later under time pressure.",
+    },
     options: [
       { id: "a", text: "Move. If you wait to be sure, it's gone.", scores: { timeHorizon: -15, powerSource: 10 } },
       { id: "b", text: "Take a small position tonight and scale if it works.", scores: { timeHorizon: 5, powerSource: -5 } },
@@ -169,6 +261,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "You lead a team through a crisis by:",
     probes: ["control", "powerSource"],
+    primaryAxis: "control",
+    framework: {
+      name: "Personal Need for Structure",
+      citation: "Neuberg & Newsom, 1993",
+      probes: "How much you reach for explicit order under pressure.",
+    },
     options: [
       { id: "a", text: "Giving one clear order and absorbing all blame if wrong.", scores: { control: 20, visibility: 15, powerSource: 10 } },
       { id: "b", text: "Staying silent while the structure you built runs.", scores: { control: 10, visibility: -15, timeHorizon: 15 } },
@@ -331,17 +429,27 @@ export const questions: Question[] = [
   {
     id: "q25",
     kind: "free-text",
-    prompt: "What's one thing people consistently underestimate about you?",
-    maxLength: 200,
+    prompt: "When was the last time you held back from saying what you actually thought? What stopped you?",
+    maxLength: 280,
     optional: true,
     usageNote: "Used to frame your 'hidden edge' section in the PDF report. Skipping reduces personalization.",
+  },
+  {
+    id: "q_email",
+    kind: "email",
+    prompt: "Where should we send your archetype profile?",
+    subPrompt: "Use a real address. Disposable / temporary inboxes are blocked.",
   },
 ];
 
 export const choiceQuestions = questions.filter(
-  (q): q is ChoiceQuestion => q.kind !== "free-text"
+  (q): q is ChoiceQuestion => q.kind !== "free-text" && q.kind !== "email"
 );
 
 export const freeTextQuestions = questions.filter(
   (q): q is FreeTextQuestion => q.kind === "free-text"
+);
+
+export const emailQuestion = questions.find(
+  (q): q is EmailQuestion => q.kind === "email"
 );
