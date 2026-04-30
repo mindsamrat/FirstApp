@@ -279,6 +279,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "Your preferred relationship with money is:",
     probes: ["visibility", "timeHorizon"],
+    primaryAxis: "timeHorizon",
+    framework: {
+      name: "Delayed Gratification",
+      citation: "Mischel, 1972",
+      probes: "Whether you optimise for now or for compounding.",
+    },
     options: [
       { id: "a", text: "Visible. People should know what you've built.", scores: { control: 10, visibility: 20 } },
       { id: "b", text: "Liquid. You want the option to move tomorrow.", scores: { timeHorizon: -15, powerSource: 5 } },
@@ -291,6 +297,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "Someone tells you a rumor about a mutual associate. You:",
     probes: ["timeHorizon"],
+    primaryAxis: "timeHorizon",
+    framework: {
+      name: "Information Asymmetry",
+      citation: "Akerlof, 1970",
+      probes: "How you treat private information as power.",
+    },
     options: [
       { id: "a", text: "Act on it if useful, even if it's only 60% likely to be true.", scores: { timeHorizon: -10, powerSource: 10 } },
       { id: "b", text: "Verify quietly through two other sources before deciding.", scores: { control: 10, visibility: -10, timeHorizon: 15 } },
@@ -303,6 +315,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "When you want someone romantically, your approach is to:",
     probes: ["visibility", "powerSource"],
+    primaryAxis: "powerSource",
+    framework: {
+      name: "Approach Motivation",
+      citation: "Gable, 2006",
+      probes: "Push (pursuit) versus pull (attraction) in intimate dynamics.",
+    },
     options: [
       { id: "a", text: "Make your interest unmistakable and let them decide.", scores: { visibility: 15, powerSource: 5 } },
       { id: "b", text: "Become impossible for them to stop thinking about.", scores: { visibility: 10, powerSource: -20 } },
@@ -315,6 +333,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "You make a public mistake and lose face. You:",
     probes: ["visibility", "timeHorizon"],
+    primaryAxis: "visibility",
+    framework: {
+      name: "Impression Management",
+      citation: "Goffman, 1959",
+      probes: "How you repair or re-frame a damaged public self.",
+    },
     options: [
       { id: "a", text: "Own it immediately, loudly, and re-frame it as a lesson.", scores: { control: 10, visibility: 15 } },
       { id: "b", text: "Disappear for six months and return unrecognizably stronger.", scores: { visibility: -15, timeHorizon: 20 } },
@@ -327,6 +351,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "You can pick one ally for the next decade. You pick the one who is:",
     probes: ["timeHorizon", "visibility"],
+    primaryAxis: "timeHorizon",
+    framework: {
+      name: "Strong vs Weak Ties",
+      citation: "Granovetter, 1973",
+      probes: "Which kind of relationship you treat as power infrastructure.",
+    },
     options: [
       { id: "a", text: "Deeply loyal but not especially useful.", scores: { control: -5, powerSource: -10 } },
       { id: "b", text: "Brilliant but transactional.", scores: { timeHorizon: -5, powerSource: 10 } },
@@ -337,25 +367,37 @@ export const questions: Question[] = [
   {
     id: "q18",
     kind: "branched",
-    prompt: "In a crowd, you are usually:",
-    probes: ["visibility"],
+    prompt: "When you need someone to change their mind, you usually:",
+    probes: ["powerSource", "control"],
+    primaryAxis: "powerSource",
+    framework: {
+      name: "Compliance vs Identification",
+      citation: "Kelman, 1958",
+      probes: "Whether your influence relies on pressure, reframing, or pull.",
+    },
     options: [
-      { id: "a", text: "The voice people turn toward when something goes wrong.", scores: { control: 15, visibility: 15, powerSource: 5 } },
-      { id: "b", text: "The one nobody notices until they do.", scores: { visibility: 5, powerSource: -20 } },
-      { id: "c", text: "Outside the crowd, watching patterns others miss.", scores: { control: 5, visibility: -15, timeHorizon: 20 } },
-      { id: "d", text: "In motion. Crowds are transitions, not destinations.", scores: { timeHorizon: -15, powerSource: 5 } },
+      { id: "a", text: "Show them the cost of staying where they are.", scores: { control: 10, powerSource: 15 } },
+      { id: "b", text: "Spend the time to get close enough that they want to listen.", scores: { timeHorizon: 10, powerSource: -15 } },
+      { id: "c", text: "Re-frame the question so their old position no longer applies.", scores: { control: 15, timeHorizon: 10 } },
+      { id: "d", text: "Wait for the world to do the convincing for you.", scores: { timeHorizon: 20, visibility: -10 } },
     ],
   },
   {
     id: "q19",
     kind: "branched",
-    prompt: "A mentor or boss is holding you back. You:",
-    probes: ["timeHorizon", "powerSource"],
+    prompt: "When something goes wrong in your life, your first thought is usually:",
+    probes: ["control"],
+    primaryAxis: "control",
+    framework: {
+      name: "Locus of Control",
+      citation: "Rotter, 1966",
+      probes: "Whether you treat outcomes as your fault, the system's, or someone else's.",
+    },
     options: [
-      { id: "a", text: "Confront them once, directly, and ask for what you need.", scores: { visibility: 15, timeHorizon: -10, powerSource: 10 } },
-      { id: "b", text: "Build your next move in silence until you can leave on your terms.", scores: { control: 10, visibility: -15, timeHorizon: 20 } },
-      { id: "c", text: "Make yourself so essential they promote you to protect themselves.", scores: { control: 15, timeHorizon: 15, powerSource: -5 } },
-      { id: "d", text: "Get recognized elsewhere until they have to adapt.", scores: { visibility: 20, powerSource: -10 } },
+      { id: "a", text: "What did I miss that I should have seen sooner?", scores: { control: 15, timeHorizon: 5 } },
+      { id: "b", text: "What system or rule failed, and how do I rebuild it?", scores: { control: 10, timeHorizon: 15 } },
+      { id: "c", text: "Who has the authority to fix this, and how do I reach them?", scores: { control: -10, visibility: 5 } },
+      { id: "d", text: "Who benefits from this happening to me?", scores: { control: 10, powerSource: 10, timeHorizon: 5 } },
     ],
   },
   {
@@ -363,6 +405,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "Your real edge comes from:",
     probes: ["control", "powerSource", "timeHorizon"],
+    primaryAxis: "control",
+    framework: {
+      name: "Bases of Social Power (self-attributed)",
+      citation: "French & Raven, 1959",
+      probes: "Which of the five power bases you most identify with.",
+    },
     options: [
       { id: "a", text: "The people who owe you favors and would take your call tonight.", scores: { control: 15, visibility: -5, timeHorizon: 15 } },
       { id: "b", text: "Something about how you think that others simply don't share.", scores: { control: 5, visibility: -5, timeHorizon: 15, powerSource: -5 } },
@@ -375,6 +423,12 @@ export const questions: Question[] = [
     kind: "branched",
     prompt: "When you see a problem others have missed, you usually:",
     probes: ["powerSource", "timeHorizon", "visibility"],
+    primaryAxis: "timeHorizon",
+    framework: {
+      name: "Pattern Recognition Under Uncertainty",
+      citation: "Klein, 1998",
+      probes: "How you convert insight into action — fast, slow, or stored.",
+    },
     options: [
       { id: "a", text: "Say so publicly and quickly, before someone else claims it.", scores: { visibility: 15, timeHorizon: -10, powerSource: 5 } },
       { id: "b", text: "Explain it slowly to one person who can actually act on it.", scores: { visibility: 5, timeHorizon: 15, powerSource: -10 } },
@@ -387,6 +441,12 @@ export const questions: Question[] = [
     kind: "tiebreaker",
     prompt: "If no one ever knew what you achieved, would you still do it?",
     probes: ["visibility"],
+    primaryAxis: "visibility",
+    framework: {
+      name: "Intrinsic vs Extrinsic Motivation",
+      citation: "Deci & Ryan, 1985",
+      probes: "Whether recognition is the goal or a side effect.",
+    },
     options: [
       { id: "a", text: "No. Power without witness is just effort.", scores: { visibility: 20, powerSource: -5 } },
       { id: "b", text: "Yes, but I'd build differently.", scores: { visibility: -15, timeHorizon: 10 } },
@@ -399,6 +459,12 @@ export const questions: Question[] = [
     kind: "tiebreaker",
     prompt: "You get what you want most often by:",
     probes: ["powerSource"],
+    primaryAxis: "powerSource",
+    framework: {
+      name: "Influence Mechanisms",
+      citation: "Cialdini, 1984",
+      probes: "Whether your influence runs on fear, charm, structure, or framing.",
+    },
     options: [
       { id: "a", text: "Making people afraid of the alternative.", scores: { control: 10, powerSource: 20 } },
       { id: "b", text: "Making people want to please you.", scores: { visibility: 5, powerSource: -20 } },
@@ -411,6 +477,12 @@ export const questions: Question[] = [
     kind: "tiebreaker",
     prompt: "Your most satisfying wins usually:",
     probes: ["timeHorizon"],
+    primaryAxis: "timeHorizon",
+    framework: {
+      name: "Time Preference",
+      citation: "Frederick, Loewenstein & O'Donoghue, 2002",
+      probes: "Whether you derive satisfaction from speed or from compounding.",
+    },
     options: [
       { id: "a", text: "Come in a single moment, cleanly.", scores: { timeHorizon: -20, powerSource: 10 } },
       { id: "b", text: "Take years, and few people see the full chain.", scores: { visibility: -15, timeHorizon: 20 } },

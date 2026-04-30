@@ -38,7 +38,7 @@ export function computeSignatureAnswers(
       );
       const pull = before - after;
       const q = questions.find((qq) => qq.id === a.q);
-      if (!q || q.kind === "free-text") return null;
+      if (!q || q.kind === "free-text" || q.kind === "email") return null;
       const option = q.options.find((o) => o.id === a.o);
       if (!option) return null;
       return {

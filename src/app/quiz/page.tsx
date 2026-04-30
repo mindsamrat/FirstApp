@@ -11,7 +11,7 @@ import {
   type FreeTextAnswer,
   type QuizProgress,
 } from "@/lib/quiz-engine";
-import type { ChoiceQuestion, FreeTextQuestion, OptionId, Question } from "@/data/questions";
+import type { ChoiceQuestion, EmailQuestion, FreeTextQuestion, OptionId, Question } from "@/data/questions";
 
 const STORAGE_KEY = "pq_progress_v1";
 const STORAGE_MAX_AGE_MS = 1000 * 60 * 60 * 48; // 48 hours
@@ -148,13 +148,61 @@ export default function QuizPage() {
     [advance, progress, transitioning]
   );
 
+  const submitEmail = useCallback(
+    async (email: string): Promise<{ ok: boolean; error?: string }> => {
+      const finalResult = finalize(progress);
+      const payload = {
+        email,
+        archetypeId: finalResult.match.archetype.id,
+        scores: finalResult.scores,
+        pq: finalResult.pq,
+        answers: progress.choiceAnswers.map((a) => ({ q: a.questionId, o: a.optionId, d: a.delta })),
+        freeText: progress.freeTextAnswers,
+        source: "free-pdf" as const,
+      };
+
+      try {
+        const res = await fetch("/api/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          return { ok: false, error: body.error ?? "Could not save your response. Try again." };
+        }
+
+        clearProgress();
+        try {
+          sessionStorage.setItem("pq_freetext_v1", JSON.stringify(progress.freeTextAnswers));
+          sessionStorage.setItem("pq_answers_v1", JSON.stringify(payload.answers));
+          if (body.responseId) sessionStorage.setItem("pq_response_id", body.responseId);
+        } catch { /* ignore */ }
+
+        const qs = new URLSearchParams({
+          id: finalResult.match.archetype.id,
+          c: String(finalResult.scores.control),
+          v: String(finalResult.scores.visibility),
+          t: String(finalResult.scores.timeHorizon),
+          p: String(finalResult.scores.powerSource),
+          pq: String(finalResult.pq),
+        });
+        router.push(`/results?${qs.toString()}`);
+        return { ok: true };
+      } catch {
+        return { ok: false, error: "Network error. Try again." };
+      }
+    },
+    [progress, router]
+  );
+
   const current = plan[cursor];
   const step = cursor + 1;
   const total = plan.length;
   const progressPct = (step / total) * 100;
 
   useEffect(() => {
-    if (!current || current.kind === "free-text") return;
+    if (!current || current.kind === "free-text" || current.kind === "email") return;
     const map: Record<string, OptionId> = { "1": "a", "2": "b", "3": "c", "4": "d" };
     const handler = (e: KeyboardEvent) => {
       const id = map[e.key];
@@ -202,6 +250,12 @@ export default function QuizPage() {
                 question={current}
                 disabled={transitioning}
                 onSubmit={(text) => handleFreeText(current, text)}
+              />
+            ) : current.kind === "email" ? (
+              <EmailStep
+                key={current.id}
+                question={current}
+                onSubmit={submitEmail}
               />
             ) : (
               <ChoiceStep
@@ -257,6 +311,72 @@ function ChoiceStep({
           </button>
         ))}
       </div>
+    </>
+  );
+}
+
+function EmailStep({
+  question,
+  onSubmit,
+}: {
+  question: EmailQuestion;
+  onSubmit: (email: string) => Promise<{ ok: boolean; error?: string }>;
+}) {
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (submitting) return;
+    setError(null);
+    setSubmitting(true);
+    const result = await onSubmit(email);
+    if (!result.ok) {
+      setError(result.error ?? "Something went wrong.");
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <>
+      <p className="text-[10px] tracking-[0.3em] uppercase text-accent/60 text-center mb-4 font-[family-name:var(--font-body)]">
+        Final Step — Required
+      </p>
+      <h2 className="font-[family-name:var(--font-heading)] text-xl md:text-2xl font-semibold text-text-primary text-center mb-3 leading-relaxed">
+        {question.prompt}
+      </h2>
+      <p className="text-text-muted/50 text-xs md:text-sm text-center mb-8 font-[family-name:var(--font-body)] italic max-w-sm mx-auto">
+        {question.subPrompt}
+      </p>
+
+      <form onSubmit={submit} className="flex flex-col gap-4">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="your@email.com"
+          autoComplete="email"
+          required
+          autoFocus
+          disabled={submitting}
+          className="w-full glass rounded-xl px-5 py-4 text-text-primary text-sm md:text-base font-[family-name:var(--font-body)] placeholder:text-text-muted/30 focus:outline-none"
+        />
+        {error && (
+          <p className="text-accent text-xs font-[family-name:var(--font-body)] text-center">{error}</p>
+        )}
+        <button
+          type="submit"
+          disabled={submitting || email.length < 5}
+          className="bg-accent hover:bg-accent-light disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm py-4 rounded-xl transition-all duration-300 font-[family-name:var(--font-body)] cursor-pointer glow-accent btn-shine"
+        >
+          {submitting ? "Analyzing..." : "Reveal My Archetype"}
+        </button>
+      </form>
+      <p className="text-text-muted/30 text-[10px] mt-6 text-center font-[family-name:var(--font-body)]">
+        We store this with your answers so you can return to your report.
+        Disposable / temporary inboxes are blocked.
+      </p>
     </>
   );
 }
