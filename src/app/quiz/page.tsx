@@ -149,9 +149,10 @@ export default function QuizPage() {
   );
 
   const submitEmail = useCallback(
-    async (email: string): Promise<{ ok: boolean; error?: string }> => {
+    async (name: string, email: string): Promise<{ ok: boolean; error?: string }> => {
       const finalResult = finalize(progress);
       const payload = {
+        name,
         email,
         archetypeId: finalResult.match.archetype.id,
         scores: finalResult.scores,
@@ -320,8 +321,9 @@ function EmailStep({
   onSubmit,
 }: {
   question: EmailQuestion;
-  onSubmit: (email: string) => Promise<{ ok: boolean; error?: string }>;
+  onSubmit: (name: string, email: string) => Promise<{ ok: boolean; error?: string }>;
 }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -331,7 +333,7 @@ function EmailStep({
     if (submitting) return;
     setError(null);
     setSubmitting(true);
-    const result = await onSubmit(email);
+    const result = await onSubmit(name.trim(), email.trim());
     if (!result.ok) {
       setError(result.error ?? "Something went wrong.");
       setSubmitting(false);
@@ -350,15 +352,26 @@ function EmailStep({
         {question.subPrompt}
       </p>
 
-      <form onSubmit={submit} className="flex flex-col gap-4">
+      <form onSubmit={submit} className="flex flex-col gap-3">
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={question.namePrompt}
+          autoComplete="given-name"
+          required
+          autoFocus
+          maxLength={60}
+          disabled={submitting}
+          className="w-full glass rounded-xl px-5 py-4 text-text-primary text-sm md:text-base font-[family-name:var(--font-body)] placeholder:text-text-muted/30 focus:outline-none"
+        />
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="your@email.com"
+          placeholder={question.emailPrompt}
           autoComplete="email"
           required
-          autoFocus
           disabled={submitting}
           className="w-full glass rounded-xl px-5 py-4 text-text-primary text-sm md:text-base font-[family-name:var(--font-body)] placeholder:text-text-muted/30 focus:outline-none"
         />
@@ -367,8 +380,8 @@ function EmailStep({
         )}
         <button
           type="submit"
-          disabled={submitting || email.length < 5}
-          className="bg-accent hover:bg-accent-light disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm py-4 rounded-xl transition-all duration-300 font-[family-name:var(--font-body)] cursor-pointer glow-accent btn-shine"
+          disabled={submitting || name.trim().length < 1 || email.length < 5}
+          className="bg-accent hover:bg-accent-light disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm py-4 rounded-xl transition-all duration-300 font-[family-name:var(--font-body)] cursor-pointer glow-accent btn-shine mt-2"
         >
           {submitting ? "Analyzing..." : "Reveal My Archetype"}
         </button>

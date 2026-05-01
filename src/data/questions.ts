@@ -53,6 +53,8 @@ export interface EmailQuestion {
   kind: "email";
   prompt: string;
   subPrompt: string;
+  namePrompt: string;
+  emailPrompt: string;
 }
 
 export type Question = ChoiceQuestion | FreeTextQuestion | EmailQuestion;
@@ -509,8 +511,10 @@ export const questions: Question[] = [
   {
     id: "q_email",
     kind: "email",
-    prompt: "Where should we send your archetype profile?",
-    subPrompt: "Use a real address. Disposable / temporary inboxes are blocked.",
+    prompt: "Almost there. Tell us who this report belongs to.",
+    subPrompt: "Your name appears on the cover and in the analysis. Disposable / temporary email addresses are blocked.",
+    namePrompt: "Your first name",
+    emailPrompt: "Your email",
   },
 ];
 

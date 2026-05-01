@@ -20,6 +20,7 @@ export function getServerSupabase(): SupabaseClient | null {
 }
 
 export interface ResponseRow {
+  name: string;
   email: string;
   archetypeId: string;
   pq: number;
@@ -38,6 +39,7 @@ export async function saveResponseToSupabase(row: ResponseRow): Promise<string |
   const { data, error } = await sb
     .from("responses")
     .insert({
+      name: row.name,
       email: row.email,
       archetype_id: row.archetypeId,
       pq_score: row.pq,
