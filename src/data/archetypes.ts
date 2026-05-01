@@ -31,6 +31,21 @@ export interface Archetype {
   enemyTactics: string;
   /** 1-paragraph long-form description for the paid PDF "Your Archetype" page. */
   archetypeDepth: string;
+  /** Animal totem assigned to this archetype. Adds an identity hook beyond the name. */
+  totem: { animal: string; meaning: string };
+  /** 3 scenarios where this archetype wins, used in the paid PDF. */
+  winScenarios: { label: string; text: string }[];
+  /** 3 failure modes specific to this archetype, used in the paid PDF. */
+  loseModes: { label: string; text: string }[];
+  /** Power Pairings: which archetypes amplify, neutralise, or drain this one. */
+  pairings: {
+    amplifies: { id: string; reason: string };
+    drains: { id: string; reason: string };
+  };
+  /** 90-day improvement plan tailored to this archetype. */
+  roadmap: { phase: string; weeks: string; focus: string }[];
+  /** Personal-letter close ("Dear [Name]" template body). */
+  closingLetter: string;
 }
 
 export const archetypes: Archetype[] = [
@@ -71,6 +86,28 @@ export const archetypes: Archetype[] = [
       "The Shadow is built to neutralise you. They do not stand opposite you — they stand behind your decisions, shaping the inputs you trust. To survive a Shadow, you must accept that the room is never as clean as it looks. Audit your information sources quarterly: who has access, who filters what you see, who benefits from your blind spots. Reward people for telling you what you don't want to hear. The Shadow's only weapon is your assumption that your authority is enough. Take that assumption away and they have nothing.",
     archetypeDepth:
       "The Sovereign is the archetype of explicit authority — power that names itself, sits at the head of the table, and signs the document. Where other archetypes wield influence sideways, you wield it down. Your neural signature reads as elevated baseline confidence with moderate cortisol: the rare combination that lets you stay decisive without becoming reckless. Caesar built Rome's first imperial template by making his own ambition look like the empire's destiny. Elizabeth I inherited a fractured kingdom and turned visibility itself into armour — her image became the institution. Lee Kuan Yew converted a swamp into a city-state by treating every decision as a precedent. The pattern is consistent: Sovereigns build kingdoms that function with or without them, but they do this by making their own authority undeniable while they live.",
+    totem: { animal: "Lion", meaning: "Visible apex. Holds territory by being seen, not by hiding. The pride watches the lion to know what to do." },
+    winScenarios: [
+      { label: "In the boardroom", text: "When a decision needs to be made and the room is paralysed, you make it. Your speed of conviction collapses other people's hesitation. You tend to be promoted faster than peers because authority recognises authority." },
+      { label: "In partnerships", text: "You set the standard early. Partners self-select based on whether they can match your weight. The relationships you build are public, formal, and have explicit terms — which makes them durable when stress hits." },
+      { label: "In a crisis", text: "Crisis is your home turf. While others freeze, you absorb blame, give one clear order, and pull the room behind you. People remember crises by who took the call. They will remember you." },
+    ],
+    loseModes: [
+      { label: "Echo chamber", text: "Your authority makes people stop disagreeing with you. By year three of any role, your team is filtering reality before it reaches you. You discover problems six months too late." },
+      { label: "The brittle throne", text: "You build institutions around your own taste. When you leave the room, the institution breaks. Sovereigns who don't groom successors are remembered as failures regardless of how well they ran things." },
+      { label: "Loyalty as theatre", text: "You mistake compliance for agreement. The first sign your inner circle has gone hollow is that meetings get easier. They aren't easier — people just stopped trying." },
+    ],
+    pairings: {
+      amplifies: { id: "architect", reason: "Architects build the durable systems that survive past your reign. A Sovereign without an Architect builds a brand. With one, you build an institution." },
+      drains: { id: "shadow", reason: "Shadows do not contest your authority openly. They accumulate small advantages in your blind spots. Two years in you discover decisions you thought were yours were already made for you." },
+    },
+    roadmap: [
+      { phase: "Foundation", weeks: "Weeks 1-3", focus: "Audit your information channels. Name the people whose interpretation of reality you trust by default. That list is your blind spot." },
+      { phase: "Recalibration", weeks: "Weeks 4-7", focus: "Add one advisor whose only job is to disagree with you, in writing, weekly. Pay them enough that they stay candid." },
+      { phase: "Succession", weeks: "Weeks 8-12", focus: "Identify your second. Invest one hour a week training them to make your decisions in your voice. The institution begins to outlive you in week 12." },
+    ],
+    closingLetter:
+      "The Sovereign archetype is the most public form of power, which means it carries the most public form of consequence. The version of you that succeeds at 60 is not the same one that wins at 30 — it is the one who learns, somewhere in the middle, that the throne is a tool, not a trophy. Build the institution. Name the successor. Let one person tell you no. The rest will follow.",
   },
   {
     id: "shadow",
@@ -109,6 +146,28 @@ export const archetypes: Archetype[] = [
       "The Sovereign is your natural enemy because they operate on the axis you reject — visibility. They cannot be neutralised by being out-thought, only by being out-waited or out-flanked through the people they trust. Never confront a Sovereign directly: you will lose the room. Instead, become indispensable to the people they rely on. Sovereigns over-trust the second tier because they assume their own selection is sound. Position yourself in that tier. When the moment comes that the Sovereign needs information they don't have, you become the bridge. The Sovereign falls inward, never outward. Your job is to be the person standing beside them when it happens.",
     archetypeDepth:
       "The Shadow is the rarest archetype — roughly 6% of respondents — and the most strategically formidable. You operate on a principle that most people find counterintuitive: power increases as visibility decreases. While the Sovereign builds kingdoms, you build the conditions that make kingdoms possible. Lorenzo de' Medici ran Florence for thirty years without ever holding formal office — he simply made the city's prosperity dependent on his network. Madeleine Albright shaped American foreign policy through information access more than rank. Talleyrand outlived four French regimes by being the person each new ruler couldn't function without. The Shadow's signature is patience that compounds — you accumulate small advantages that, individually, never reveal the pattern, but cumulatively become impossible to remove.",
+    totem: { animal: "Raven", meaning: "Watches before it moves. Memory carrier. Always knows where the bodies are. Disappears the second after it lands." },
+    winScenarios: [
+      { label: "In high-stakes negotiation", text: "You arrive having already mapped what the other side wants and what they fear. They think they're shaping the deal; the deal is being shaped before they sit down. Outcomes feel like coincidence to everyone but you." },
+      { label: "Inside a coalition", text: "You become the connective tissue. Three years later people can't quite remember when you became indispensable. Removing you would require dismantling things they don't want to dismantle." },
+      { label: "When others fail visibly", text: "Your reputation rises through other people's failures because you were one degree removed from each one. You bear no scar; you carry every lesson." },
+    ],
+    loseModes: [
+      { label: "The stockpile that rots", text: "Information you never spend becomes a liability. After year five you have too much leverage to use without revealing yourself, and the leverage decays into trivia." },
+      { label: "Total opacity", text: "You become so unreadable that even your closest allies don't trust you. Loyalty requires legibility. Your opacity, past a threshold, costs you the network you spent decades building." },
+      { label: "Mistaking patience for paralysis", text: "Some windows close. The Shadow's classic failure is the move never made — the year-six action that would have crowned the strategy, but you waited for one more confirming signal." },
+    ],
+    pairings: {
+      amplifies: { id: "diplomat", reason: "Diplomats give your invisible work a face the world can engage with. A Shadow paired with a Diplomat looks like a happy coincidence; it isn't." },
+      drains: { id: "sovereign", reason: "Sovereigns demand visibility and credit, which is your blast radius. Long collaborations with a Sovereign reveal your shape. Choose engagements that end before they require you to be seen." },
+    },
+    roadmap: [
+      { phase: "Audit", weeks: "Weeks 1-3", focus: "List every leverage position you currently hold. Note which ones you have used in the last year. The unused ones are the ones to pressure-test or release." },
+      { phase: "Surface once", weeks: "Weeks 4-8", focus: "Pick one professional moment to claim credit publicly and clearly. Specific, dated, attributable. You do not need to do this twice. Once a year is enough to keep your network real." },
+      { phase: "Apprentice one", weeks: "Weeks 9-12", focus: "Find one person you trust and start teaching them how to see what you see. Pure shadows die forgotten. Train one inheritor and the pattern survives you." },
+    ],
+    closingLetter:
+      "Shadows are the rarest type because the cost of becoming one is high and the rewards are private. You will not get a parade. You will get rooms quietly arranged around your interest, decisions other people think are theirs, and a long career that no one quite knows the shape of. That is the trade. Be careful that the trade is still worth it at year fifteen.",
   },
   {
     id: "architect",
@@ -147,6 +206,28 @@ export const archetypes: Archetype[] = [
       "The Blade is built to undo you. Where you build slowly, they cut quickly. Where you map every contingency, they make a decision before your meeting starts. You cannot out-think a Blade in real time — they aren't trying to think, they're trying to move. The Architect's defence is structural, not tactical. Build systems that don't need your real-time presence: contracts, processes, dependencies that survive disruption. When a Blade attacks, the Architect who has shipped wins. The Architect who is still planning loses. Your discipline is to prefer 'good and shipped' over 'perfect and theoretical', especially in the presence of fast-moving threats.",
     archetypeDepth:
       "The Architect's signature is temporal abstraction — a brain that treats next decade and next minute with similar weight. Most human cognition discounts the future at 50–80%; yours operates closer to 15–20%, which is neurologically rare. You are wired for compound thinking. Charlie Munger built Berkshire's edge on a single mental model: long horizons + simple rules + ruthless avoidance of stupidity. Octavia Butler wrote books about systems that take centuries to play out. John Boyd's OODA loop wasn't a tactic — it was a system of systems that reshaped military doctrine for fifty years. The Architect's failure mode isn't failure; it's never-quite-starting. Every Architect's worst enemy is the perfect blueprint they refuse to downgrade by building.",
+    totem: { animal: "Owl", meaning: "Sees in the dark. Builds the nest before the storm. Doesn't move until the move is right; moves decisively when it is." },
+    winScenarios: [
+      { label: "Designing institutions", text: "You see the second-order consequences others miss. The org chart you draft today still works in year ten because you built for the dynamic, not the snapshot." },
+      { label: "Long-horizon investing", text: "Your flat temporal-discount curve gives you a structural edge in any domain where patience compounds. You routinely make trades that look mediocre at year two and obvious at year seven." },
+      { label: "After a crisis", text: "While others fight fires, you redesign the building. Architects do their best work in the year following a collapse — your blueprints land in soil that's finally ready." },
+    ],
+    loseModes: [
+      { label: "Analysis paralysis", text: "Your simulations are so detailed that execution feels like a downgrade. The plan in your head is always better than the v1 you could ship today. Most Architects never lose; they never start." },
+      { label: "Ivory tower drift", text: "Without a tight feedback loop you build for elegance instead of fit. Your blueprint solves the problem you imagined three years ago, not the one in front of you." },
+      { label: "Disdain for momentum", text: "You sometimes mistake decisiveness for stupidity. Blades and Hunters move before you finish thinking, and sometimes they win because moving is the answer." },
+    ],
+    pairings: {
+      amplifies: { id: "blade", reason: "A Blade gives your system its motor. They will make your imperfect plan run today, and the plan-while-running gets sharper than the plan-on-paper ever could." },
+      drains: { id: "hunter", reason: "Hunters demand answers your timeline can't give them. Long-running Architect/Hunter projects calcify into resentment on both sides — you think they're reckless, they think you're stalling." },
+    },
+    roadmap: [
+      { phase: "Compress", weeks: "Weeks 1-3", focus: "Pick one project you've been planning for over six months. Force-ship a v1 by week 3. The criterion is 'works' not 'right'." },
+      { phase: "Pair", weeks: "Weeks 4-7", focus: "Recruit a Blade or Hunter to be your shipping partner. Give them veto power on perfectionism. Your job is to be persuaded out of one polish-step a week." },
+      { phase: "Document", weeks: "Weeks 8-12", focus: "Capture the reasoning behind the decisions you actually made (not the ones you almost made). Reasoning compounds; conclusions age." },
+    ],
+    closingLetter:
+      "Architects build things that outlive them. The catch: they only outlive you if they exist. The blueprint folder full of unbuilt buildings is the saddest artifact in any career. Pick one. Build it. The next one comes easier because the first one happened.",
   },
   {
     id: "oracle",
@@ -185,6 +266,28 @@ export const archetypes: Archetype[] = [
       "The Hunter is built to neutralise you because they ignore what you value most: the long pattern. Where you see the seven-year arc, the Hunter sees this week's opportunity and exits before your warning lands. Arguing with a Hunter about the future is futile — they discount it. Instead, structure the world so the present becomes their teacher. Hunters respect cost, not concept. If you can show a Hunter that this week's quick exit costs them something concrete this month, you have their attention. Otherwise, let them go. The Hunter's velocity is your patience's compound interest.",
     archetypeDepth:
       "The Oracle's signature is pattern recognition under uncertainty — the ability to see structure in noise that others can only confirm in retrospect. George Kennan watched Stalin's Russia in 1946 and wrote the Long Telegram, which framed forty years of American policy. Carl Jung mapped the unconscious mind through patterns most psychologists dismissed as anecdotal. Nate Silver turned poll-noise into prediction infrastructure. The Oracle's burden is twofold: first, the loneliness of seeing what isn't yet visible; second, the frustration of knowing the warning will not be believed until it's already too late. Most Oracles fail not because they're wrong, but because they cannot translate their pattern into something a Hunter or Blade can act on.",
+    totem: { animal: "Serpent", meaning: "Sees through still water. Strikes once, then waits. Carries every old wisdom and never explains itself." },
+    winScenarios: [
+      { label: "Diagnosing a stuck system", text: "You walk into a team that's been running in circles and within an hour you've named the actual problem. Your value rises sharply when others' frameworks have failed." },
+      { label: "Long bets", text: "Your forecasts age well. The trades you make on year-five horizons become reputation when they pay off — and they pay off, because you only place bets you can defend." },
+      { label: "Mentoring", text: "You shape people by naming patterns in them they hadn't yet articulated. The students you produce carry your vocabulary; through them you outlive your own career." },
+    ],
+    loseModes: [
+      { label: "The prophet without followers", text: "You see clearly and explain badly. Your warnings land as arrogance because you can't translate the pattern into the listener's vocabulary. Right and unheard is still wrong, in practice." },
+      { label: "Insight as substitute for action", text: "Pattern recognition is intoxicating, and Oracles sometimes confuse seeing with doing. A correctly diagnosed problem you didn't act on is still a problem, plus a regret." },
+      { label: "Confirmation drift", text: "Once you've named a pattern publicly, every new data point confirms it. Oracles who don't actively look for disconfirming evidence calcify into pundits." },
+    ],
+    pairings: {
+      amplifies: { id: "diplomat", reason: "Diplomats translate your patterns into language coalitions can act on. Oracle/Diplomat partnerships have shaped foreign policy for centuries — you see, they move." },
+      drains: { id: "hunter", reason: "Hunters discount your timeline and think you're slow. Long collaborations with Hunters tend to end with you watching them re-learn a lesson you flagged two years prior." },
+    },
+    roadmap: [
+      { phase: "Time-stamp", weeks: "Weeks 1-3", focus: "Start a private prediction journal with dated entries. Specific predictions only. Your track record is the only credential that scales." },
+      { phase: "Translate", weeks: "Weeks 4-7", focus: "Take your three strongest insights and rewrite each in language a Blade would act on. If they can't act on it, you haven't translated yet." },
+      { phase: "Apprentice", weeks: "Weeks 8-12", focus: "Pick one person you'll spend a year teaching to read what you read. Oracles who don't teach are forgotten the year they retire." },
+    ],
+    closingLetter:
+      "The Oracle's gift is also the loneliness of being early. Most of what you'll be right about, you'll be right about alone. The trick is to learn to translate without resenting the translation. The pattern was never the point; the people you helped see it were.",
   },
   {
     id: "blade",
@@ -223,6 +326,28 @@ export const archetypes: Archetype[] = [
       "The Architect is your natural enemy because they win by waiting longer than you can. They will not engage on your timetable; they engineer the situation so your fastest move is also your most exposed. The Blade who fights an Architect on their terms always loses — because the Blade's terms are speed, and the Architect's terms are structure. Defeat the Architect by refusing the engagement they've designed for you. Walk away from set-piece battles. Strike where they have no plan. The Architect is dangerous in systems they've built. They are vulnerable in chaos they didn't predict.",
     archetypeDepth:
       "The Blade is wired for kinetic clarity. Your ventral striatum produces more dopamine in chaotic environments than stable ones — you literally feel better when stakes are high. Napoleon won 60 battles by moving before his enemies finished forming up. Serena Williams reshaped tennis by treating the next point as the only point. Early Steve Jobs forced a stagnant computing industry forward by burning processes faster than the market could replace them. The Blade's signature is anti-fragility under pressure. Your failure mode is the move you didn't need to make: scars accumulated by speed unchecked by selection. Blades who survive into their forties learn one skill — when not to cut.",
+    totem: { animal: "Wolf", meaning: "Single-minded pursuit. Closes the distance fast. Pack-aware but never consensus-bound. Bites once, decisively." },
+    winScenarios: [
+      { label: "Stalled situations", text: "Anywhere others have been hesitating for months, you arrive and force the move. Your willingness to be wrong fast collapses other people's analysis paralysis." },
+      { label: "Asymmetric fights", text: "When you have less to lose, you wield speed as the variable that doesn't show up in their model. Blades win matchups where the spreadsheet says they shouldn't." },
+      { label: "Crisis turnaround", text: "You make decisions in the first 48 hours that take competitors three weeks. Your scar tissue from being wrong-fast trains the team faster than any retreat would." },
+    ],
+    loseModes: [
+      { label: "Cut once too many", text: "Half your scars are from cutting too soon. Blades who don't develop a 48-hour-pause habit on irreversible moves accumulate bridges burned that they later need." },
+      { label: "Speed as identity", text: "When your reputation IS speed, slowing down feels like betrayal. The Blade trap is staying kinetic in domains where compounding would have served better." },
+      { label: "No second", text: "You move so fast your team can't keep up. Blades without an Architect partner end careers as solo operators — talented, feared, structurally lonely." },
+    ],
+    pairings: {
+      amplifies: { id: "architect", reason: "Architects give your speed direction. They tell you which moves are reversible and which aren't. The pairing turns your kinetic energy into compound growth." },
+      drains: { id: "oracle", reason: "Oracles slow you down by 12 months trying to convince you of patterns you don't have time for. You're not wrong to ignore them; you're wrong to do it 100% of the time." },
+    },
+    roadmap: [
+      { phase: "The pause", weeks: "Weeks 1-3", focus: "Implement a 48-hour rule on irreversible moves involving people who can't protect themselves. The pause is the discipline." },
+      { phase: "Anchor", weeks: "Weeks 4-7", focus: "Pick one Architect-type advisor with veto power on long-horizon decisions. Pay them. Listen to them on dates ending in zero." },
+      { phase: "Compound something", weeks: "Weeks 8-12", focus: "Identify one position you'd normally exit. Stay in it. The discipline isn't slowing down generally — it's letting one thing run." },
+    ],
+    closingLetter:
+      "Speed is your gift. Speed is also the thing that ends most Blade careers in their forties. The version of you that becomes legendary is the one who learns when not to cut. Pick the right cut. Build the right second. The next forty years are about subtraction.",
   },
   {
     id: "diplomat",
@@ -261,6 +386,28 @@ export const archetypes: Archetype[] = [
       "The Flame is built to neutralise you because they convert rooms through magnetism faster than you can convert them through composure. Where you build alignment slowly, the Flame creates devotion in minutes. You cannot out-charm a Flame. You can, however, out-last them. Magnetism erodes; structure compounds. The Diplomat who waits, who keeps the room functioning when the Flame's heat fades, becomes the person the room turns to next. Do not contest the Flame's stage. Build the room they will eventually need to enter — and own the keys.",
     archetypeDepth:
       "The Diplomat is the most socially intelligent archetype — your temporoparietal junction shows co-activation patterns associated with advanced perspective-taking, meaning you can hold multiple frames simultaneously without losing your own. Angela Merkel led Germany through three crises by being the person every faction trusted to be reasonable. Barack Obama held a coalition together that contained ideological opposites. Nelson Mandela won South Africa's transition by refusing to make his enemies feel cornered. The Diplomat's strength is also their cage: alliance-addiction. Your oxytocin response to social bonding is genuine, but it makes the decisive move that costs you a relationship feel like physiological injury. The Diplomats who become great are the ones who learn to eat that injury.",
+    totem: { animal: "Crane", meaning: "Walks between waters. Never rushes. Holds equal grace toward predator and prey. The room reorganises itself around its calm." },
+    winScenarios: [
+      { label: "Stuck negotiations", text: "Where two sides are locked in, you find the third axis nobody named. Your value spikes when other people's frameworks have produced stalemate." },
+      { label: "Cross-cultural work", text: "Your default to 'translate' rather than 'judge' makes you the natural broker in any room where people speak different professional languages." },
+      { label: "Long alliances", text: "Your relationships compound. The colleague you were patient with at 25 funds your idea at 40. Diplomats outperform their resume by year fifteen." },
+    ],
+    loseModes: [
+      { label: "The kept room", text: "You will not break the alliance even when it's the right move. The ceiling on Diplomat power is the number of relationships you refuse to lose." },
+      { label: "Consensus as idol", text: "You can solve disagreements too fast. Sometimes tension is the leverage. Killing it early kills the deal you would have been able to make later." },
+      { label: "Likability without spine", text: "If the room never sees you take a hard line, your skill reads as service rather than power. Power requires occasional refusal." },
+    ],
+    pairings: {
+      amplifies: { id: "shadow", reason: "Shadows give you covert reach you wouldn't claim for yourself. They do the work; you handle the public face. The pairing is rare and devastatingly effective." },
+      drains: { id: "flame", reason: "Flames win rooms in minutes through magnetism while you build alignment in months. In direct competition the Flame seems to win first; you are not always sure how to compete." },
+    },
+    roadmap: [
+      { phase: "Name the line", weeks: "Weeks 1-3", focus: "Write down three things you will not compromise on. The list is short. It is sacred. Tell three trusted people what's on it." },
+      { phase: "Practice the cost", weeks: "Weeks 4-7", focus: "Pick one alliance you'll consciously let cool because it costs you the line. Surviving that loss is the threshold of Diplomat power." },
+      { phase: "Lead the hard ask", weeks: "Weeks 8-12", focus: "Be the one who names the difficult thing first in three meetings this quarter. Diplomacy with courage is power. Without courage, it's hospitality." },
+    ],
+    closingLetter:
+      "Diplomats are the most loved archetype, which means the temptation to keep being loved is their core trap. Your power is the alliance you're willing to lose. The version of you that becomes great is the one who, just once, picked the line over the room. After that everything is easier.",
   },
   {
     id: "hunter",
@@ -299,6 +446,28 @@ export const archetypes: Archetype[] = [
       "The Oracle is your natural enemy because they see the cost of your speed before you do. They cannot match your tempo, but they don't need to — they wait for the moment your momentum becomes a liability. The Hunter who learns to listen to one trusted Oracle dramatically extends their career. Most Hunters don't, and burn out. To neutralise an Oracle, the Hunter must do the one thing they hate: slow down long enough to test the prediction. Either the Oracle is right and you've saved a year, or they're wrong and you've lost a week. Either trade is good.",
     archetypeDepth:
       "The Hunter operates at velocity. Your ventromedial prefrontal cortex processes opportunity-value faster than other archetypes — you literally see leverage before others see noise. Carl Icahn built a fortune on activist trades others called impossible. Travis Kalanick scaled Uber by treating regulatory approval as a problem to outrun, not solve. Han Solo's whole arc is a Hunter being asked to develop loyalty to something larger than the next exit. The Hunter's shadow is the velocity trap: you exit positions just before they would have compounded, and then wonder why your peers — slower, less talented — somehow ended up with empires. The Hunter who survives is the one who picks one position they refuse to leave.",
+    totem: { animal: "Hawk", meaning: "Sees movement from a mile away. Strikes from height. Never lingers. Already on the next thermal before the rabbit hits the ground." },
+    winScenarios: [
+      { label: "New markets", text: "You see opportunity where others see chaos. Hunters thrive in unstructured environments because structure is what slows everyone else down." },
+      { label: "Distressed assets", text: "Your detachment from sentiment makes you the ideal buyer when emotions have crashed an asset's price below its real value. You feel no nostalgia for what others paid." },
+      { label: "Negotiation under pressure", text: "Your willingness to walk gives you the leverage others don't have. The Hunter who can leave any deal usually leaves with the better one." },
+    ],
+    loseModes: [
+      { label: "The velocity trap", text: "You exit positions just before they would have compounded. Your peers — slower, less talented — end up with empires while you have a sequence of completed exits." },
+      { label: "Burnt bridges", text: "Each exit costs you a relationship you might have needed at the next door. Hunters in their fifties often discover their network is wide and shallow when they need it deep." },
+      { label: "Speed without selection", text: "Anything that moves becomes a target. Hunters who don't develop selection criteria spend twenty years optimising for tempo and zero years for mastery." },
+    ],
+    pairings: {
+      amplifies: { id: "blade", reason: "Blades match your tempo without asking you to slow down. The pair operates faster than any team can defend against, which is sometimes exactly the right tool." },
+      drains: { id: "architect", reason: "Architects ask you to wait through year two of a thesis and you don't trust the wait. The pair tends to dissolve before the thesis pays out." },
+    },
+    roadmap: [
+      { phase: "Pick one", weeks: "Weeks 1-3", focus: "Identify one position you'd normally exit. Commit to staying in it for 12 months. The discipline is selection, not stillness." },
+      { phase: "Anchor", weeks: "Weeks 4-7", focus: "Name one relationship you will not burn for any deal. Document why. Hunters with one immovable anchor outperform Hunters with none across every decade." },
+      { phase: "Compound", weeks: "Weeks 8-12", focus: "Pick one of capital, reputation, or relationship — and start treating that one specific thing as if your career depended on its compounding. Pick what you most undervalue." },
+    ],
+    closingLetter:
+      "Hunters get rich. Hunters rarely build empires. The difference is one decision — usually somewhere in your thirties — to let one specific thing run past your usual exit point. The work after that decision compounds in ways you can't currently picture. Pick the thing.",
   },
   {
     id: "flame",
@@ -337,6 +506,28 @@ export const archetypes: Archetype[] = [
       "The Diplomat is built to neutralise you because they win rooms through composure when you win them through heat. They aren't trying to compete with your magnetism — they're patient enough to outlast it. The Flame's defence isn't more charm; it's structure. A Flame with one boring discipline (a calendar that holds, a financial habit that compounds, a relationship that pre-dates the audience) becomes immune to the slow erosion the Diplomat counts on. Without that structure, you remain dazzling and exhaustible. With it, you become the rare thing: a Flame that doesn't dim.",
     archetypeDepth:
       "The Flame's signature is referent power — magnetism that draws people without requiring command. Cleopatra wasn't the most beautiful woman in the ancient world, but Plutarch wrote that 'her presence struck the listener with astonishment.' Muhammad Ali turned boxing into theatre by being the most magnetic person in any room, fight or otherwise. David Bowie reinvented his audience every five years and they followed. Daisy Buchanan, Fitzgerald's masterpiece, made an entire generation of men ruin themselves chasing what they couldn't define. The Flame's failure mode is hedonic adaptation. Audiences need novelty, and novelty is the most expensive thing to manufacture. Flames who survive their thirties learn one thing — to convert pure magnetism into something that compounds when the room cools.",
+    totem: { animal: "Phoenix", meaning: "Burns visibly. Renews from its own ashes. Cannot help but be watched. The room it leaves is colder than the one it enters." },
+    winScenarios: [
+      { label: "Stages and audiences", text: "You become the thing the room can't look away from. Flames perform best where attention is the currency — media, performance, brand-building, anywhere a story is being told." },
+      { label: "The first 30 days", text: "New jobs, new partnerships, new cities. Your magnetism converts the new room within a month. Flames are unparalleled at first impressions and short campaigns." },
+      { label: "Persuasion under doubt", text: "When the case isn't air-tight on paper, your presence carries it. Investors back you, customers commit, partners say yes — for reasons they describe later as 'gut feel.'" },
+    ],
+    loseModes: [
+      { label: "The cool room", text: "Magnetism that doesn't get reinforced with structure decays. Flames in their forties often describe a sense that the room got quieter — and they don't know what changed. Nothing changed. The signal just decayed." },
+      { label: "Audience burn", text: "The people drawn to you arrive faster than you can deepen with them. By year five your network is wide and emotionally shallow." },
+      { label: "Magnetism without spine", text: "Pure pull without occasional refusal becomes service. People love you and ignore your asks. Flames need to demonstrate cost — show that 'no' is in your vocabulary — to keep the magnetism a currency rather than a courtesy." },
+    ],
+    pairings: {
+      amplifies: { id: "architect", reason: "Architects build the structures that carry your magnetism past the heat decay. A Flame paired with an Architect builds a brand that survives the lulls between charismatic peaks." },
+      drains: { id: "diplomat", reason: "Diplomats win rooms slowly through composure when you win them quickly through heat. Long alongside-Diplomat collaborations tend to leave you feeling like the room moved on without you." },
+    },
+    roadmap: [
+      { phase: "One boring system", weeks: "Weeks 1-3", focus: "Build one habit that runs whether the audience is watching or not — finance, calendar, exercise. Pick the one you most resist. That's the one." },
+      { phase: "Three deepenings", weeks: "Weeks 4-7", focus: "Pick three relationships and invest in their depth this quarter. Stop collecting shallow ones for ninety days. Notice what shifts." },
+      { phase: "Practice the no", weeks: "Weeks 8-12", focus: "Say the hard 'no' that costs you a room at least once. Magnetism survives one true no. It dies of yes." },
+    ],
+    closingLetter:
+      "The Flame is the most enviable archetype and the hardest to age into. Magnetism is a young person's currency unless you trade it deliberately for something that compounds. Build the boring scaffolding now. The version of you at 50 will thank the version of you reading this.",
   },
 ];
 
