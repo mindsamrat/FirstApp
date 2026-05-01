@@ -118,6 +118,25 @@ interface DbResponse {
 }
 
 export async function GET(req: Request) {
+  try {
+    return await renderPaidPdf(req);
+  } catch (err) {
+    console.error("[pdf-paid] uncaught error", err);
+    const message = err instanceof Error ? err.message : "unknown";
+    const stack = err instanceof Error ? err.stack : undefined;
+    const debug = new URL(req.url).searchParams.get("debug") === "1";
+    return new Response(
+      JSON.stringify({
+        error: "PDF generation failed",
+        message,
+        stack: debug ? stack : undefined,
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+}
+
+async function renderPaidPdf(req: Request) {
   registerFonts();
   const { searchParams } = new URL(req.url);
   const responseId = searchParams.get("id");
