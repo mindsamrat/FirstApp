@@ -30,10 +30,10 @@ export interface ResponseRow {
   ipAddress?: string | null;
 }
 
-/** Insert a quiz response into Supabase. Returns the new row's UUID, or null if not configured. */
+/** Insert a quiz response into Supabase. Returns the new row's UUID. Throws on configured-but-failing writes. */
 export async function saveResponseToSupabase(row: ResponseRow): Promise<string | null> {
   const sb = getServerSupabase();
-  if (!sb) return null;
+  if (!sb) return null; // env not configured -> caller decides fallback
 
   const { data, error } = await sb
     .from("responses")
@@ -52,8 +52,9 @@ export async function saveResponseToSupabase(row: ResponseRow): Promise<string |
     .single();
 
   if (error) {
-    console.error("[supabase] insert response failed", error);
-    return null;
+    // Surface the real error so /api/subscribe can include it in its 500 response
+    // instead of silently falling back to local storage.
+    throw new Error(error.message || "supabase insert failed");
   }
   return data?.id ?? null;
 }

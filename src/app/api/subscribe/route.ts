@@ -71,25 +71,38 @@ export async function POST(req: Request) {
   const xff = req.headers.get("x-forwarded-for");
   const ip = xff ? xff.split(",")[0].trim() : null;
 
-  // Primary: write to Supabase if configured, else fall back to local NDJSON scaffold.
+  // Primary: write to Supabase if configured. If env is set but the write
+  // fails (RLS, schema mismatch, etc.) — surface the error so the user sees
+  // it instead of silently falling through to the local NDJSON scaffold.
+  const supabaseConfigured = !!(process.env.SUPABASE_URL &&
+    (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY));
+
   let responseId: string | null = null;
-  try {
-    responseId = await saveResponseToSupabase({
-      email: emailCheck.normalized,
-      archetypeId: archetype.id,
-      pq,
-      scores,
-      answers,
-      freeText,
-      userAgent,
-      ipAddress: ip,
-    });
-  } catch (err) {
-    console.error("[subscribe] supabase write failed", err);
+  if (supabaseConfigured) {
+    try {
+      responseId = await saveResponseToSupabase({
+        email: emailCheck.normalized,
+        archetypeId: archetype.id,
+        pq,
+        scores,
+        answers,
+        freeText,
+        userAgent,
+        ipAddress: ip,
+      });
+    } catch (err) {
+      console.error("[subscribe] supabase write failed", err);
+      return NextResponse.json(
+        {
+          error: `Could not save your response: ${err instanceof Error ? err.message : "unknown error"}`,
+        },
+        { status: 500 }
+      );
+    }
   }
 
   if (!responseId) {
-    // Fallback to the local scaffold so leads aren't lost while Supabase env is missing.
+    // Supabase not configured -> dev fallback to keep local quiz testing alive.
     const record = await recordSubscriber({
       email: emailCheck.normalized,
       archetypeId: archetype.id,
