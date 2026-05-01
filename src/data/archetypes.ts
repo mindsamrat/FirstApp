@@ -46,6 +46,8 @@ export interface Archetype {
   roadmap: { phase: string; weeks: string; focus: string }[];
   /** Personal-letter close ("Dear [Name]" template body). */
   closingLetter: string;
+  /** 3 relatable life-pattern scenarios common among this archetype. */
+  lifePatterns: { context: string; pattern: string }[];
 }
 
 export const archetypes: Archetype[] = [
@@ -108,6 +110,11 @@ export const archetypes: Archetype[] = [
     ],
     closingLetter:
       "The Sovereign archetype is the most public form of power, which means it carries the most public form of consequence. The version of you that succeeds at 60 is not the same one that wins at 30 — it is the one who learns, somewhere in the middle, that the throne is a tool, not a trophy. Build the institution. Name the successor. Let one person tell you no. The rest will follow.",
+    lifePatterns: [
+      { context: "In group projects since school", pattern: "You always end up the de-facto leader, whether or not you wanted the role. People look at you when there's a decision to make and you make it. You've sometimes resented the weight; you've never quite handed it back." },
+      { context: "When relationships shift", pattern: "You're usually the one who ends them, and you usually do it cleanly. The people you've left rarely hate you — they describe you as 'inevitable.' You can read this as cold; it's actually clarity." },
+      { context: "When you're not in charge", pattern: "Working under someone you don't respect feels physically uncomfortable. You will tolerate it for a year, maybe two, and then you'll either reshape the situation or leave. There is no third option." },
+    ],
   },
   {
     id: "shadow",
@@ -168,6 +175,11 @@ export const archetypes: Archetype[] = [
     ],
     closingLetter:
       "Shadows are the rarest type because the cost of becoming one is high and the rewards are private. You will not get a parade. You will get rooms quietly arranged around your interest, decisions other people think are theirs, and a long career that no one quite knows the shape of. That is the trade. Be careful that the trade is still worth it at year fifteen.",
+    lifePatterns: [
+      { context: "In groups", pattern: "You have always preferred to listen first. People tell you things they don't tell others — and then forget they did. You've quietly carried information that could have changed several rooms; you usually decide not to use it." },
+      { context: "When credit is being handed out", pattern: "You step back from credit even when you did the work. Sometimes this is strategic; sometimes it's habit. You've watched louder people get promoted past you and felt complicated about it. You weren't wrong to wait — but you may have waited too long once or twice." },
+      { context: "Close relationships", pattern: "Trust is harder for you than people realise. You're warm enough to read as warm, guarded enough that even your closest people sometimes feel like they don't fully know you. The few you do let in have known for a long time." },
+    ],
   },
   {
     id: "architect",
@@ -228,6 +240,11 @@ export const archetypes: Archetype[] = [
     ],
     closingLetter:
       "Architects build things that outlive them. The catch: they only outlive you if they exist. The blueprint folder full of unbuilt buildings is the saddest artifact in any career. Pick one. Build it. The next one comes easier because the first one happened.",
+    lifePatterns: [
+      { context: "When you have a new idea", pattern: "You can spend three months sketching the system before you ship anything. Sometimes that produces the breakthrough. Sometimes the moment passes and someone with half your insight ships a worse version that wins." },
+      { context: "In conversations", pattern: "You quietly model two-three steps ahead of what people are saying. Friends sometimes describe you as 'distant' when really you're parsing implications they don't see yet. You've felt lonely for this reason." },
+      { context: "When systems break", pattern: "Crises that paralyse others are oddly clarifying for you. You're at your best after collapse — when the old structure is gone and the room is finally ready to listen to your blueprint." },
+    ],
   },
   {
     id: "oracle",
@@ -288,6 +305,11 @@ export const archetypes: Archetype[] = [
     ],
     closingLetter:
       "The Oracle's gift is also the loneliness of being early. Most of what you'll be right about, you'll be right about alone. The trick is to learn to translate without resenting the translation. The pattern was never the point; the people you helped see it were.",
+    lifePatterns: [
+      { context: "Long before others see it", pattern: "You named a problem six months early and got told you were being negative. The problem arrived. Some people remembered you flagged it; most didn't. You learned to soften how you say things, but the seeing didn't slow down." },
+      { context: "In friendships", pattern: "People bring you their tangled situations expecting you to listen, and you can't help yourself — you see the pattern and you name it. Sometimes they wanted comfort, not analysis. You've worked on noticing the difference; it's still your default to diagnose." },
+      { context: "When you're wrong", pattern: "When your prediction misses, you take it personally — more than the people who were never asked to predict in the first place. The ones who get the future wrong publicly remember it longer. Build that into the work." },
+    ],
   },
   {
     id: "blade",
@@ -348,6 +370,11 @@ export const archetypes: Archetype[] = [
     ],
     closingLetter:
       "Speed is your gift. Speed is also the thing that ends most Blade careers in their forties. The version of you that becomes legendary is the one who learns when not to cut. Pick the right cut. Build the right second. The next forty years are about subtraction.",
+    lifePatterns: [
+      { context: "Decision speed", pattern: "You make decisions in the time others use to schedule the meeting about the decision. People describe you as 'intense' or 'a lot.' Both are true. Both are usually said with admiration that someone disguises as criticism." },
+      { context: "When you've been wrong", pattern: "You've burned a relationship or a job or a deal by moving too fast. You don't dwell on it the way others would expect — but the cost is real, and it shows up later in unexpected places. Track them." },
+      { context: "Stillness", pattern: "Doing nothing genuinely makes you uncomfortable. Vacations are awkward; long meetings feel like punishment. The discipline you most need to develop is the one that feels least natural — the discipline of waiting." },
+    ],
   },
   {
     id: "diplomat",
@@ -408,6 +435,11 @@ export const archetypes: Archetype[] = [
     ],
     closingLetter:
       "Diplomats are the most loved archetype, which means the temptation to keep being loved is their core trap. Your power is the alliance you're willing to lose. The version of you that becomes great is the one who, just once, picked the line over the room. After that everything is easier.",
+    lifePatterns: [
+      { context: "Group dynamics", pattern: "You're often the bridge — the person both 'sides' trust. You feel responsible for the room. When the room fractures you feel it physically, and you can spend weeks rebuilding bridges no one asked you to mend. Some of those bridges weren't worth rebuilding." },
+      { context: "Saying no", pattern: "'No' costs you more than it costs other people. You agree to things you didn't have time for and then quietly resent the agreement. The skill you most need is to let one person down on purpose, watch yourself survive it, and adjust the calibration." },
+      { context: "Conflict avoidance", pattern: "You will route around a difficult conversation for months. The avoided conversation usually grows bigger; you usually pay the cost later, alone. The hard talk you keep postponing is almost always the one that would change the most." },
+    ],
   },
   {
     id: "hunter",
@@ -468,6 +500,11 @@ export const archetypes: Archetype[] = [
     ],
     closingLetter:
       "Hunters get rich. Hunters rarely build empires. The difference is one decision — usually somewhere in your thirties — to let one specific thing run past your usual exit point. The work after that decision compounds in ways you can't currently picture. Pick the thing.",
+    lifePatterns: [
+      { context: "Career", pattern: "You change roles or directions more often than your peers. Some of those moves were brilliant timing; some were exits from things that would have rewarded you if you'd stayed. You can usually feel the difference between the two; you don't always trust the feeling." },
+      { context: "Money", pattern: "You make and lose money in larger swings than most people. You're comfortable with the volatility, which is unusual and valuable. The part you're working on is the long position — the one you don't exit when the chart looks ugly at year two." },
+      { context: "Relationships", pattern: "You've ended things cleanly that other people would have stayed in too long. You've also ended things prematurely. The one anchor relationship you don't burn for any deal is the difference between Hunter and Hunter-who-built-something." },
+    ],
   },
   {
     id: "flame",
@@ -528,6 +565,11 @@ export const archetypes: Archetype[] = [
     ],
     closingLetter:
       "The Flame is the most enviable archetype and the hardest to age into. Magnetism is a young person's currency unless you trade it deliberately for something that compounds. Build the boring scaffolding now. The version of you at 50 will thank the version of you reading this.",
+    lifePatterns: [
+      { context: "Entering rooms", pattern: "People notice when you enter, even when you didn't try. You've been told you 'have a presence' since you were a teenager. Sometimes that attention is uncomfortable; sometimes it's exactly what you wanted. You haven't always known which was which." },
+      { context: "Romantic dynamics", pattern: "People fall for you faster than they should and recover slower than they expect. You've sometimes been the unexpected protagonist in someone else's story — and not always wanted that role. You're not as casual about this as you sometimes appear." },
+      { context: "Sustained focus", pattern: "Showing up for the unglamorous middle-stretch of a project is genuinely harder for you than for most. You can launch anything. Finishing without an audience is the muscle you're still building. That's not a flaw — it's the work." },
+    ],
   },
 ];
 

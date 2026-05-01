@@ -238,6 +238,102 @@ export function deriveReadings(scores: AxisScores): DerivedReading[] {
   });
 }
 
+// ---------- Level-up moves ----------
+//
+// For each axis × band combination, three concrete moves: what to keep doing,
+// what to develop next (the growth direction), what to watch out for. This is
+// what gets surfaced on the "How to Level Up" page of the paid PDF.
+
+interface LevelUpMoves { keep: string; develop: string; watch: string }
+
+const LEVEL_UP: Record<AxisId, Record<"low" | "mid" | "high", LevelUpMoves>> = {
+  control: {
+    low: {
+      keep: "Your influence-first approach generates less resistance and more durable buy-in than direct command does. Don't trade that for performative authority.",
+      develop: "Practice making one decision a week that you'd normally route up. Tell the other person after, not before. Notice that the world doesn't end.",
+      watch: "Low control under acute pressure can curdle into deferral. When the room genuinely needs a call and no one else is making it, that's the moment to make yours.",
+    },
+    mid: {
+      keep: "You can lead when needed and step back when serving. That flexibility is rare and undervalued.",
+      develop: "Pick three things you will never compromise on. Tell the people who report to you. Hold the line in two situations this quarter where it costs you.",
+      watch: "Mid-control without anchoring values can read as opportunistic. Define what you stand for in plain language; otherwise the room fills in their own answer.",
+    },
+    high: {
+      keep: "Your decisiveness is the antidote to other people's paralysis. Rooms run faster when you're in them.",
+      develop: "Add one advisor whose only job is to disagree with you in writing, weekly. Pay them enough that they stay candid. Make them part of the structure, not an option.",
+      watch: "Authority filters reality. By year three of any role your team is editing what reaches you. Audit your information channels every quarter — name who shapes what you see.",
+    },
+  },
+  visibility: {
+    low: {
+      keep: "Working in the dark is a structural advantage. Critics can't aim at what they can't see.",
+      develop: "Once a quarter, claim one win publicly. Specific, dated, attributable. You don't need to do it twice — once a year keeps your network real.",
+      watch: "Total invisibility curdles into irrelevance. People forget the architect of wins they enjoyed. Surface deliberately, on your terms.",
+    },
+    mid: {
+      keep: "You're seen when it matters and quiet when it doesn't. The audience whose opinion you optimise for is the one whose opinion compounds.",
+      develop: "Pick one signature platform — writing, speaking, building publicly — and commit for 12 months. No half-bets. The compounding starts in month 9.",
+      watch: "Mid-visibility without commitment reads as indecision. Some rooms need you to pick a stage.",
+    },
+    high: {
+      keep: "Recognition is a multiplier. You use it consciously, which is what separates real visibility from vanity.",
+      develop: "For every public win, document one private mistake from the same season. The contrast keeps you honest and gives critics less to invent.",
+      watch: "Visibility makes you a target. Build armour before profile. Have one room where you're allowed to be wrong without it being content.",
+    },
+  },
+  timeHorizon: {
+    low: {
+      keep: "Speed is your weapon. You've shipped more by Tuesday than slower types ship by Friday.",
+      develop: "Pick one position you'd normally exit. Stay in it 12 more months. Compound something — capital, reputation, or a relationship.",
+      watch: "Speed without selection burns the relationships you compound on. Identify one anchor you will not burn for any deal. Document why.",
+    },
+    mid: {
+      keep: "You hold tactical and strategic in the same hand. Patience is a tool, not a default — that's the rare combination.",
+      develop: "Write a one-paragraph 10-year vision. Read it weekly. Reject moves that don't move you toward it.",
+      watch: "Mid-horizon without an anchor drifts. Years stack and the pattern doesn't. Name what you want to be true at 50.",
+    },
+    high: {
+      keep: "You play decade-long games. Setbacks read as data points, not events. Compounding is your structural edge.",
+      develop: "Ship one thing this month that would normally feel premature to you. Imperfect-and-shipped is the missing leg of strategy.",
+      watch: "Strategic patience without execution is the most expensive form of cowardice. A blueprint you've held for over six months is asking to be tested in the world.",
+    },
+  },
+  powerSource: {
+    low: {
+      keep: "Pull beats push for durable influence. People who move toward you stay; people you push leave the moment the pressure does.",
+      develop: "Practice one hard 'no' a quarter that costs you a room. Magnetism that has no spine becomes service. The first true 'no' restores its value.",
+      watch: "Pure pull without consequence creates beautiful systems with no spine. People love you and ignore your asks. Show that 'no' is in your vocabulary.",
+    },
+    mid: {
+      keep: "You mix warmth and weight. People feel both your charm and the cost of crossing you.",
+      develop: "Be deliberate about which mode you use when. Dedicate one week each month to leading with warmth, one with weight. Note the difference in outcomes.",
+      watch: "Inconsistency on power-source can feel arbitrary to your team. They prefer 'always firm' or 'always warm' over 'sometimes both' if the rule isn't visible.",
+    },
+    high: {
+      keep: "Your leverage is consequence. People calculate you before they move. You don't repeat yourself; the room remembers.",
+      develop: "Find one person who is not afraid of you and pay them to tell you what your team is hiding. The cost of that audit is small. The cost of not doing it scales.",
+      watch: "Force-based power costs you the truth. People stop telling you what you don't want to hear. By year three you are deciding on a curated reality.",
+    },
+  },
+};
+
+export interface LevelUpEntry { axis: AxisId; label: string; band: "low" | "mid" | "high"; score: number; moves: LevelUpMoves }
+
+export function levelUpMoves(scores: AxisScores): LevelUpEntry[] {
+  const axes: AxisId[] = ["control", "visibility", "timeHorizon", "powerSource"];
+  return axes.map((axis) => {
+    const value = scores[axis];
+    const band: "high" | "mid" | "low" = value <= 33 ? "low" : value >= 67 ? "high" : "mid";
+    return {
+      axis,
+      label: axisLongLabels[axis],
+      band,
+      score: value,
+      moves: LEVEL_UP[axis][band],
+    };
+  });
+}
+
 // ---------- Helpers ----------
 
 export function topArchetypes(blend: BlendEntry[], n = 3): BlendEntry[] {

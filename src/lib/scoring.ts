@@ -23,21 +23,31 @@ export interface MatchResult {
   needsTiebreaker: boolean;
 }
 
+/**
+ * Compress cumulative deltas slightly so even strongly-aligned answer patterns
+ * don't pin at the 0/100 endpoints. A factor of 0.8 means a respondent who
+ * picked the "most Sovereign" option on every relevant question lands around
+ * 85 on Control rather than at 100 — preserving a sense that growth (or
+ * regression) is still possible. Centroid distances are unaffected because
+ * archetype centroids live in the same compressed space.
+ */
+const DELTA_COMPRESSION = 0.8;
+
 export function calculateAxisScores(answers: AnswerDelta[]): AxisScores {
   const raw = { control: 50, visibility: 50, timeHorizon: 50, powerSource: 50 };
 
   for (const a of answers) {
-    raw.control += a.control;
-    raw.visibility += a.visibility;
-    raw.timeHorizon += a.timeHorizon;
-    raw.powerSource += a.powerSource;
+    raw.control += a.control * DELTA_COMPRESSION;
+    raw.visibility += a.visibility * DELTA_COMPRESSION;
+    raw.timeHorizon += a.timeHorizon * DELTA_COMPRESSION;
+    raw.powerSource += a.powerSource * DELTA_COMPRESSION;
   }
 
   return {
-    control: Math.max(0, Math.min(100, raw.control)),
-    visibility: Math.max(0, Math.min(100, raw.visibility)),
-    timeHorizon: Math.max(0, Math.min(100, raw.timeHorizon)),
-    powerSource: Math.max(0, Math.min(100, raw.powerSource)),
+    control: Math.round(Math.max(0, Math.min(100, raw.control))),
+    visibility: Math.round(Math.max(0, Math.min(100, raw.visibility))),
+    timeHorizon: Math.round(Math.max(0, Math.min(100, raw.timeHorizon))),
+    powerSource: Math.round(Math.max(0, Math.min(100, raw.powerSource))),
   };
 }
 

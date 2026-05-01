@@ -13,7 +13,7 @@ import {
   type AxisId,
 } from "@/data/archetypes";
 import { getResponseById } from "@/lib/supabase-server";
-import { perAxisAttribution, deriveReadings, archetypeBlend, readConfidence, type AxisAttribution } from "@/lib/result-analysis";
+import { perAxisAttribution, deriveReadings, archetypeBlend, readConfidence, levelUpMoves, type AxisAttribution } from "@/lib/result-analysis";
 import { matchArchetype } from "@/lib/scoring";
 import { questions } from "@/data/questions";
 
@@ -328,6 +328,7 @@ async function renderPaidPdf(req: Request) {
   const confidence = readConfidence(match);
   const ampArch = getArchetypeById(archetype.pairings.amplifies.id);
   const drainArch = getArchetypeById(archetype.pairings.drains.id);
+  const levelUp = levelUpMoves(scores);
   const docId = row.id.slice(0, 8).toUpperCase();
   const dateStr = new Date(row.paid_at ?? row.created_at).toISOString().slice(0, 10);
   const watermark = `${row.email} · ${docId} · ${dateStr}`;
@@ -715,6 +716,60 @@ async function renderPaidPdf(req: Request) {
             <Text style={s.roadmapPhase}>{phase.phase}</Text>
             <Text style={s.roadmapWeeks}>{phase.weeks}</Text>
             <Text style={s.roadmapFocus}>{phase.focus}</Text>
+          </View>
+        ))}
+        <PageChrome docId={docId} watermark={watermark} />
+      </Page>
+
+      {/* 13b. REAL LIFE PATTERNS — relatable scenarios */}
+      <Page size="LETTER" style={s.page}>
+        <Text style={s.label}>Real Life Patterns</Text>
+        <Text style={s.pageTitle}>{personalName}, the parts that should feel familiar.</Text>
+        <Text style={s.body}>
+          {archetype.name}s tend to share specific patterns across work, relationships, and decision-making. Read these slowly. The point isn&apos;t flattery — it&apos;s recognition. If three of these read as accurate, the diagnosis is doing its job.
+        </Text>
+        {archetype.lifePatterns.map((p, i) => (
+          <View key={i} style={{ marginBottom: 14, padding: 12, backgroundColor: PAPER, borderLeft: `2px solid ${CRIMSON}` }}>
+            <Text style={{ fontSize: 8.5, letterSpacing: 1.5, textTransform: "uppercase", color: CRIMSON, marginBottom: 4, fontWeight: 700 }}>
+              {p.context}
+            </Text>
+            <Text style={{ fontSize: 11, lineHeight: 1.65, color: INK }}>{p.pattern}</Text>
+          </View>
+        ))}
+        <Text style={[s.caption, { marginTop: 8 }]}>
+          Not every pattern fits every person carrying this archetype. Mark the two that hit hardest. Those are the threads worth pulling on the next page.
+        </Text>
+        <PageChrome docId={docId} watermark={watermark} />
+      </Page>
+
+      {/* 13c. LEVEL UP — per-axis: keep, develop, watch */}
+      <Page size="LETTER" style={s.page}>
+        <Text style={s.label}>How to Level Up</Text>
+        <Text style={s.pageTitle}>Per-axis moves calibrated to your scores.</Text>
+        <Text style={s.body}>
+          For each axis, three moves: what to <Text style={{ color: GOLD_LIGHT, fontWeight: 700 }}>keep</Text> doing (your edge), what to <Text style={{ color: CRIMSON, fontWeight: 700 }}>develop</Text> next (the growth move), and what to <Text style={{ color: GOLD, fontWeight: 700 }}>watch</Text> for (the failure mode this score creates). Calibrated to where you actually scored, not a generic profile.
+        </Text>
+        {levelUp.map((entry) => (
+          <View key={entry.axis} wrap={false} style={{ marginBottom: 12 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}>
+              <View style={{ width: 4, height: 14, backgroundColor: AXIS_COLOR[entry.axis], marginRight: 6 }} />
+              <Text style={{ fontFamily: "Playfair", fontSize: 13, fontWeight: 700, color: INK }}>{entry.label}</Text>
+              <Text style={{ fontSize: 9.5, color: SUB, marginLeft: 8, fontStyle: "italic" }}>· {entry.band} band, {entry.score}/100</Text>
+            </View>
+            <View style={{ paddingLeft: 10 }}>
+              <View style={{ flexDirection: "row", marginBottom: 3 }}>
+                <Text style={{ width: 60, fontSize: 8.5, letterSpacing: 1.5, textTransform: "uppercase", color: GOLD_LIGHT, fontWeight: 700, paddingTop: 1 }}>Keep</Text>
+                <Text style={{ flex: 1, fontSize: 10.5, lineHeight: 1.55, color: INK }}>{entry.moves.keep}</Text>
+              </View>
+              <View style={{ flexDirection: "row", marginBottom: 3 }}>
+                <Text style={{ width: 60, fontSize: 8.5, letterSpacing: 1.5, textTransform: "uppercase", color: CRIMSON, fontWeight: 700, paddingTop: 1 }}>Develop</Text>
+                <Text style={{ flex: 1, fontSize: 10.5, lineHeight: 1.55, color: INK }}>{entry.moves.develop}</Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={{ width: 60, fontSize: 8.5, letterSpacing: 1.5, textTransform: "uppercase", color: GOLD, fontWeight: 700, paddingTop: 1 }}>Watch</Text>
+                <Text style={{ flex: 1, fontSize: 10.5, lineHeight: 1.55, color: SUB, fontStyle: "italic" }}>{entry.moves.watch}</Text>
+              </View>
+            </View>
           </View>
         ))}
         <PageChrome docId={docId} watermark={watermark} />
